@@ -1,0 +1,142 @@
+name: 02_STG_CI and ACR push (runner IP 허용)
+
+on:
+#  push:
+#    branches:
+#      - develop  # 자동 실행은 develop만
+
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Docker Image Tag (default: latest)"
+        required: false
+        default: "latest"
+
+
+
+permissions:
+  contents: write  # ✅ checkout을 위해 write 권한 필요
+
+jobs:
+  build-and-push:
+    runs-on:
+      group: organization/Default
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.ref_name }}  # 현재 푸시된 브랜치를 자동으로 사용
+
+
+    - name: Set Branch and Secrets
+      id: vars
+      run: |
+        BRANCH_NAME="${{ github.ref_name }}"
+        echo "🔹 Branch: $BRANCH_NAME"
+    
+        if [[ "$BRANCH_NAME" == "develop" ]]; then
+          echo "branch_value=dev" >> $GITHUB_OUTPUT
+          echo "azure_user=${{vars.ACR_DEV_USER}}" >> $GITHUB_OUTPUT
+          echo "acr=${{vars.ACR_DEV}}" >> $GITHUB_OUTPUT
+        elif [[ "$BRANCH_NAME" == "staging" ]]; then
+          echo "branch_value=stg" >> $GITHUB_OUTPUT
+          echo "azure_user=${{vars.ACR_STG_USER}}" >> $GITHUB_OUTPUT
+          echo "acr=${{vars.ACR_STG}}" >> $GITHUB_OUTPUT
+        elif [[ "$BRANCH_NAME" == "release" ]]; then
+          echo "branch_value=prd" >> $GITHUB_OUTPUT
+          echo "azure_user=${{vars.ACR_PRD_USER}}" >> $GITHUB_OUTPUT
+          echo "acr=${{vars.ACR_PRD}}" >> $GITHUB_OUTPUT
+        else
+          echo "❌ Unsupported branch: $BRANCH_NAME"
+          exit 1
+        fi
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    # DEV
+    - name: Azure 로그인 (DEV)
+      if: steps.vars.outputs.branch_value == 'dev'
+      uses: Azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
+
+    # STG
+    - name: Azure 로그인 (STG)
+      if: steps.vars.outputs.branch_value == 'stg'
+      uses: Azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS_STG }}
+
+    # PROD
+    - name: Azure 로그인 (PROD)
+      if: steps.vars.outputs.branch_value == 'prd'
+      uses: Azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS_PRD }}
+
+    # Action Runner의 IP를 확인
+    - name: Get Public IP
+      id: ip
+      uses: haythem/public-ip@v1.3
+
+    - name: Print Public IP
+      run: |
+        echo ${{ steps.ip.outputs.ipv4}}
+
+    - name: Log in to ACR
+      run: |
+        # 현재 네트워크 규칙에서 IP 목록을 확인
+        FULL_RULES=$(az acr network-rule list --resource-group abiz-storage-${{ steps.vars.outputs.branch_value }}-rg --name ${{ steps.vars.outputs.azure_user }} -o json)
+        
+        # 현재 네트워크 규칙에서 IP 목록을 확인
+        EXISTING_RULES=$(echo "$FULL_RULES" | jq -r ".ipRules[] | select(.ipAddressOrRange == \"${{ steps.ip.outputs.ipv4 }}\") | .ipAddressOrRange")
+
+        # IP 주소가 이미 규칙에 포함되어 있지 않으면 추가
+        if [ -z "$EXISTING_RULES" ]; then
+          echo "IP address ${{ steps.ip.outputs.ipv4 }} is not in the network rules. Adding it..."
+          az acr network-rule add --resource-group abiz-storage-${{ steps.vars.outputs.branch_value }}-rg --name ${{ steps.vars.outputs.azure_user }} --ip-address ${{ steps.ip.outputs.ipv4 }}
+        else
+          echo "IP address ${{ steps.ip.outputs.ipv4 }} is already in the network rules. Skipping addition."
+        fi
+    
+        # ACR 로그인
+        az acr login --name ${{ steps.vars.outputs.azure_user }}
+
+    - name: List files in current directory
+      run: |
+        ls -l
+
+    - name: Build and push Docker image to ACR
+      run: |
+        IMAGE_NAME=ith-chatbotback
+        IMAGE_TAG=${{ steps.vars.outputs.acr}}/gbaa/ith-chatbotback:${{ github.event.inputs.tag || 'latest' }}
+
+        if [[ "${{ steps.vars.outputs.branch_value }}" == "dev" ]]; then
+          DOCKERFILE_PATH="docker/dev-dockerfile"
+        elif [[ "${{ steps.vars.outputs.branch_value }}" == "prd" ]]; then
+          DOCKERFILE_PATH="docker/prd-dockerfile"
+        elif [[ "${{ steps.vars.outputs.branch_value }}" == "stg" ]]; then
+          DOCKERFILE_PATH="docker/stg-dockerfile"
+        else
+          echo "❌ No matching Dockerfile for branch: ${{ steps.vars.outputs.branch_value }}"
+          exit 1
+        fi
+    
+
+        echo "🛠 Building Docker image: $IMAGE_TAG"
+        docker build --platform linux/amd64 -f $DOCKERFILE_PATH -t $IMAGE_TAG .
+        echo "📤 Pushing Docker image to ACR..."
+        docker push $IMAGE_TAG
+
+    - name: Print Image Details
+      run: |
+        echo "✅ Pushed Image: ${{ steps.vars.outputs.acr}}/gbaa/${IMAGE_NAME}:${{ github.event.inputs.tag || 'latest' }}"

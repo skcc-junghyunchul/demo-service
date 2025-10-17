@@ -1,0 +1,57 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: ith-chatbotback
+  namespace: ihd
+spec:
+  selector:
+    matchLabels:
+      app: ith-chatbotback-pod
+  template:
+    metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: "opentelemetry-operator/python-auto-instrumentation"      
+      labels:
+        app: ith-chatbotback-pod
+    spec:
+      containers:
+      - name: ith-chatbotback
+        image: sk-abiz-s-ncr-main.neuro-skcnc-pub.ncr.ntruss.com/adotbiz-stg/gbaa/ith-chatbotback:latest
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: "2"
+            memory: "8Gi"
+          requests:
+            cpu: "2"
+            memory: "8Gi"
+        securityContext:
+          readOnlyRootFilesystem: false
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+        ports:
+        - name: http
+          containerPort: 8089
+        envFrom:
+        - secretRef:
+            name: ith-chatbotback-secret
+            optional: false
+
+        volumeMounts:
+        - mountPath: /home/chatbot/logs
+          name: adotbiz-nas
+          subPath: ihd/chatbot/logs
+        - name: ith-chatbotback-config
+          mountPath: /home/config.yaml
+          subPath: config.yaml    
+              
+      volumes:
+      - name: adotbiz-nas
+        persistentVolumeClaim:
+          claimName: ihd-chatbotback-pvc
+      - name: ith-chatbotback-config
+        configMap:
+          name: ith-chatbotback-config
+  

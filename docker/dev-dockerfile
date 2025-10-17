@@ -1,0 +1,28 @@
+# Step 1: FastAPI를 실행하기 위한 Python 베이스 이미지 선택
+FROM python:3.10.11
+
+WORKDIR /home/chatbot
+ARG BASEDIR=/home/chatbot
+
+#COPY --chown=aiccrag:aiccrag .env .
+COPY --chown=aiccrag:aiccrag app app
+COPY --chown=aiccrag:aiccrag config.py .
+COPY --chown=aiccrag:aiccrag requirements.txt .
+
+
+RUN pip install --no-cache-dir -r requirements.txt && \
+    pip install gunicorn  # gunicorn 설치 추가
+
+ENV PORT=8089
+ENV WORKERS=1
+ENV THREADS=4
+ENV TZ=Asia/Seoul
+ENV LOG_LEVEL=info
+
+# CMD ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8089"]
+# CMD ["sh", "-c", "gunicorn app.api:app -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT --workers=$WORKERS --threads=$THREADS"]
+# CMD ["sh", "-c", "gunicorn app.api:app -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT --workers=$WORKERS --threads=$THREADS"]
+# CMD ["gunicorn", "app.api:app", "--workers", "8", "--threads", "8", "--timeout", "300", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8089"]
+# CMD ["gunicorn", "app.api:app", "--workers", "8", "--threads", "16", "--timeout", "5000", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8089", "--keep-alive", "5000", "--graceful-timeout", "5000"]
+CMD ["gunicorn", "app.api:app", "--workers", "8", "--threads", "16", "--timeout", "5000", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8089"]
+# CMD ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8089", "--workers", "32"]

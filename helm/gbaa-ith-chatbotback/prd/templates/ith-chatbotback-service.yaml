@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ihd-chatbotback-service
+  namespace: ihd
+spec:
+  selector:
+    app: ith-chatbotback-pod
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8089

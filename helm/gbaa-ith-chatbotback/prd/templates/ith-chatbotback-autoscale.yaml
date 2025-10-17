@@ -1,0 +1,38 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: ith-chatbotback-scaledobject
+  namespace: ihd
+  annotations:
+    # autoscaling.keda.sh/paused: "true"                      # Optional. Use to pause autoscaling of objects explicitly
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ith-chatbotback
+    envSourceContainerName: ith-chatbotback
+  minReplicaCount: 2                                    
+  maxReplicaCount: 10                                    
+  triggers:
+    # - type: cron
+    #   metadata:
+    #     name: scale-up-daytime
+    #     timezone: Asia/Seoul
+    #     start: "0 9 * * *"      # 오전 9시
+    #     end: "0 18 * * *"       # 오후 6시
+    #     desiredReplicas: "5"
+    # - type: cron
+    #   metadata:
+    #     name: scale-down-night
+    #     timezone: Asia/Seoul
+    #     start: "0 18 * * *"     # 오후 6시
+    #     end: "0 9 * * *"        # 다음날 오전 9시
+    #     desiredReplicas: "1"
+    - type: cpu
+      metricType: Utilization
+      metadata:
+        value: "80"
+    - type: memory
+      metricType: Utilization
+      metadata:
+        value: "70"

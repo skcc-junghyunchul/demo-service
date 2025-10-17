@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ith-chatbotback-config
+  namespace: ihd
+  labels:
+    app: ith-chatbotback-config
+data:
+  config.yaml: |
+    # ================================================
+    # 개발 환경
+    # ================================================
+    misc:
+      rag_api_url: "http://ihd-rag-service/api/v1/service/rag"
+      ncp_redis_port: 6379
+      ncp_redis_db_chathistory: 9
+      ncp_redis_db_multi_resource: 10
+      welcome_message_prefix: "/welcome"
+
