@@ -11,18 +11,17 @@ try:
 except Exception as e:
     raise Exception(f"설정 파일 '/home/config.yaml' 로드 실패: {str(e)}")
 
-
-
 RAG_API_URL = config_data["misc"]["rag_api_url"].strip()
 NCP_REDIS_PORT = config_data["misc"]["ncp_redis_port"]
 NCP_REDIS_DB_CHATHISTORY = config_data["misc"]["ncp_redis_db_chathistory"]
 NCP_REDIS_DB_MULTI_RESOURCE = config_data["misc"]["ncp_redis_db_multi_resource"]    
 WELCOME_MESSAGE_PREFIX =  config_data["misc"]["welcome_message_prefix"].strip()
 
+# 데이터베이스 연결 타임아웃 설정
+DB_TIMEOUT = 30
 
 # from secrets
 NCP_REDIS_HOST=os.environ.get('NCP_REDIS_HOST').strip()
-
 
 # Redis 자원 맵핑
 multi_tenant_resource = {}
