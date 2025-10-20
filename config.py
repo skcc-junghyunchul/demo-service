@@ -2,6 +2,8 @@ from dotenv import load_dotenv
 import os
 import yaml
 import sys
+import logging
+
 # load .env
 load_dotenv()
 
@@ -26,9 +28,27 @@ NCP_REDIS_HOST=os.environ.get('NCP_REDIS_HOST').strip()
 # 로그 파일 경로 설정 추가
 LOG_PATH = os.environ.get('LOG_PATH')
 
-# 로그 파일 권한 확인 추가
-if LOG_PATH and not os.access(LOG_PATH, os.W_OK):
-    raise Exception(f"로그 파일에 대한 쓰기 권한이 없습니다: {LOG_PATH}")
+# 로그 파일 권한 확인 및 생성 로직 추가
+if LOG_PATH:
+    if not os.path.exists(LOG_PATH):
+        try:
+            with open(LOG_PATH, 'w') as f:
+                pass
+        except Exception as e:
+            raise Exception(f"로그 파일 생성 실패: {str(e)}")
+    
+    if not os.access(LOG_PATH, os.W_OK):
+        raise Exception(f"로그 파일에 대한 쓰기 권한이 없습니다: {LOG_PATH}")
+
+# Redis 연결 설정 검사
+import redis
+
+try:
+    redis_client = redis.StrictRedis(host=NCP_REDIS_HOST, port=NCP_REDIS_PORT, db=NCP_REDIS_DB_CHATHISTORY)
+    redis_client.ping()
+except redis.ConnectionError as e:
+    logging.error(f"Redis 연결 실패: {str(e)}")
+    raise Exception(f"Redis 연결 실패: {str(e)}")
 
 # Redis 자원 맵핑
 multi_tenant_resource = {}
