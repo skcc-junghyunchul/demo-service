@@ -18,9 +18,6 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
         "aip_transaction_id": message.aip_transaction_id 
     }
     
-    # logger.info("Rag로 보내질 Body 출력",extra={"tenant":company_code})
-    # logger.info(body)
-    
     if category is not None:
         body["category"] = category
     
@@ -40,6 +37,8 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
 
 
 def parse_user_id(string):
+    if string is None or string.strip() == "":
+        return None
     match = re.search(r'"user_id"\s*:\s*"(\w+)"', string)
     return match.group(1) if match else None
 
