@@ -37,6 +37,7 @@ LOG_PATH = os.environ.get('LOG_PATH')
 
 # 로그 파일 권한 확인 및 생성 로직 추가
 if LOG_PATH:
+    # 로그 파일이 존재하지 않으면 생성
     if not os.path.exists(LOG_PATH):
         try:
             with open(LOG_PATH, 'w') as f:
@@ -44,12 +45,14 @@ if LOG_PATH:
         except Exception as e:
             raise Exception(f"로그 파일 생성 실패: {str(e)}")
     
+    # 로그 파일에 대한 쓰기 권한 확인
     if not os.access(LOG_PATH, os.W_OK):
         try:
             os.chmod(LOG_PATH, 0o666)  # 모든 사용자에게 쓰기 권한 부여
         except Exception as e:
             raise Exception(f"로그 파일에 대한 쓰기 권한 수정 실패: {str(e)}")
     
+    # 여전히 쓰기 권한이 없는 경우 예외 발생
     if not os.access(LOG_PATH, os.W_OK):
         raise Exception(f"로그 파일에 대한 쓰기 권한이 없습니다: {LOG_PATH}")
 
