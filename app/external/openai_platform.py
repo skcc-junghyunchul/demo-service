@@ -4,7 +4,7 @@ import json
 import time
 from openai import OpenAI
 from openai.types.chat import ChatCompletionMessage
-from openai import BadRequestError
+from openai import BadRequestError, OpenAIError
 from app import logger
 from app.models.message import Message
 
@@ -70,6 +70,13 @@ async def query_openai(user_question, llm_resource_value, company_code, message:
             },
         )
     except BadRequestError as bre:
+        logger.error(f"BadRequestError: {bre}")
         raise ContentFilteringError
+    except OpenAIError as oe:
+        logger.error(f"OpenAIError: {oe}")
+        raise RuntimeError("An error occurred while querying OpenAI.")
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
+        raise RuntimeError("An unexpected error occurred.")
 
     return chat_completion.choices[0].message.content
