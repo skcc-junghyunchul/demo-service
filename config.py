@@ -65,7 +65,12 @@ logging.basicConfig(
 
 # Redis 연결 설정 검사
 try:
-    redis_client = redis.StrictRedis(host=NCP_REDIS_HOST, port=NCP_REDIS_PORT, db=NCP_REDIS_DB_CHATHISTORY)
+    redis_client = redis.StrictRedis(
+        host=NCP_REDIS_HOST,
+        port=NCP_REDIS_PORT,
+        db=NCP_REDIS_DB_CHATHISTORY,
+        max_connections=10  # pool_size 증가
+    )
     redis_client.ping()
 except redis.ConnectionError as e:
     logging.error(f"Redis 연결 실패: {str(e)}")
