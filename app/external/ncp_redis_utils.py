@@ -1,7 +1,5 @@
 import json
-# import redis.asyncio as redis
 import redis
-# from app.external.chatbot_redis_client import redis_client
 from app import logger
 import config as config
 from app.external.ncp_redis_client import get_redis_client
@@ -12,8 +10,8 @@ def set_conversation(conversation_id: str, state: str = "", history: dict | None
     """ 대화 상태를 Redis에 저장 (예외 처리 추가) """
     history = history or {}
     try:
-        get_redis_client(NCP_REDIS_DB_CHATHISTORY).hset(conversation_id, mapping={"state": state, "history": json.dumps(history)})
-        get_redis_client(NCP_REDIS_DB_CHATHISTORY).expire(conversation_id, 1800)  # 30분 후 만료
+        get_redis_client(NCP_REDIS_DB_CHATHISTORY, timeout=config.DB_TIMEOUT).hset(conversation_id, mapping={"state": state, "history": json.dumps(history)})
+        get_redis_client(NCP_REDIS_DB_CHATHISTORY, timeout=config.DB_TIMEOUT).expire(conversation_id, 1800)  # 30분 후 만료
     except redis.RedisError as e:
         logger.exception(f"Redis 저장 중 오류 발생: {e}")
 
@@ -21,7 +19,7 @@ def set_conversation(conversation_id: str, state: str = "", history: dict | None
 def get_conversation(conversation_id: str) -> dict | None:
     """ 대화 상태를 Redis에서 가져옴 (예외 처리 추가) """
     try:
-        data = get_redis_client(NCP_REDIS_DB_CHATHISTORY).hgetall(conversation_id)
+        data = get_redis_client(NCP_REDIS_DB_CHATHISTORY, timeout=config.DB_TIMEOUT).hgetall(conversation_id)
         if not data:
             return None
 
@@ -72,6 +70,6 @@ def delete_conversation(conversation_id: str) -> None:
         return
 
     try:
-        get_redis_client(NCP_REDIS_DB_CHATHISTORY).delete(conversation_id)
+        get_redis_client(NCP_REDIS_DB_CHATHISTORY, timeout=config.DB_TIMEOUT).delete(conversation_id)
     except redis.RedisError as e:
         logger.exception(f"Redis 삭제 중 오류 발생: {e}")
