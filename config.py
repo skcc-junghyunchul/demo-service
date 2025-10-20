@@ -53,6 +53,13 @@ if LOG_PATH:
     if not os.access(LOG_PATH, os.W_OK):
         raise Exception(f"로그 파일에 대한 쓰기 권한이 없습니다: {LOG_PATH}")
 
+# 로거 설정
+logging.basicConfig(
+    filename=LOG_PATH,
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
 # Redis 연결 설정 검사
 try:
     redis_client = redis.StrictRedis(host=NCP_REDIS_HOST, port=NCP_REDIS_PORT, db=NCP_REDIS_DB_CHATHISTORY)
