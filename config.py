@@ -3,6 +3,7 @@ import os
 import yaml
 import sys
 import logging
+import redis
 
 # load .env
 load_dotenv()
@@ -23,7 +24,7 @@ WELCOME_MESSAGE_PREFIX =  config_data["misc"]["welcome_message_prefix"].strip()
 DB_TIMEOUT = 30
 
 # from secrets
-NCP_REDIS_HOST=os.environ.get('NCP_REDIS_HOST').strip()
+NCP_REDIS_HOST = os.environ.get('NCP_REDIS_HOST').strip()
 
 # 로그 파일 경로 설정 추가
 LOG_PATH = os.environ.get('LOG_PATH')
@@ -41,8 +42,6 @@ if LOG_PATH:
         raise Exception(f"로그 파일에 대한 쓰기 권한이 없습니다: {LOG_PATH}")
 
 # Redis 연결 설정 검사
-import redis
-
 try:
     redis_client = redis.StrictRedis(host=NCP_REDIS_HOST, port=NCP_REDIS_PORT, db=NCP_REDIS_DB_CHATHISTORY)
     redis_client.ping()
