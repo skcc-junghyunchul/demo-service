@@ -23,6 +23,13 @@ DB_TIMEOUT = 30
 # from secrets
 NCP_REDIS_HOST=os.environ.get('NCP_REDIS_HOST').strip()
 
+# 로그 파일 경로 설정 추가
+LOG_PATH = os.environ.get('LOG_PATH')
+
+# 로그 파일 권한 확인 추가
+if LOG_PATH and not os.access(LOG_PATH, os.W_OK):
+    raise Exception(f"로그 파일에 대한 쓰기 권한이 없습니다: {LOG_PATH}")
+
 # Redis 자원 맵핑
 multi_tenant_resource = {}
 
