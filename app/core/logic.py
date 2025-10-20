@@ -28,12 +28,18 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
         results = await call_rag_api(query_params={}, body=body)
         return results
     
-    except ValueError as ve:  # 400 오류
+    except ValueError as ve:  
         logger.exception(ve,extra={"tenant":company_code})
         return {"error": str(ve)}
-    except Exception as e:  # 206 또는 500 포함 기타
+    except Exception as e:  
         logger.exception(e,extra={"tenant":company_code})
         return {"error": str(e)}
+    finally:
+        del body
+        if chat_history is not None:
+            del chat_history
+        if message is not None:
+            del message
 
 
 def parse_user_id(string):
