@@ -9,13 +9,13 @@ import redis
 load_dotenv()
 
 # 필수 환경 변수 확인
-required_env_vars = ['NCP_REDIS_HOST', 'LOG_PATH']
+required_env_vars = ['NCP_REDIS_HOST', 'LOG_PATH', 'DATABASE_URL']
 for var in required_env_vars:
     if os.environ.get(var) is None:
         raise Exception(f"필수 환경 변수 '{var}'가 설정되어 있지 않습니다.")
 
 # 데이터베이스 URL 설정
-DATABASE_URL = 'your_database_url_here'
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
 try:
     with open("/home/config.yaml", 'r', encoding='utf-8') as f:
