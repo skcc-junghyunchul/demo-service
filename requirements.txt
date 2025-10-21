@@ -34,3 +34,4 @@ boto3
 opentelemetry-api
 opentelemetry-distro 
 opentelemetry-exporter-otlp
+FastAPI
