@@ -46,6 +46,7 @@ if LOG_PATH:
             with open(LOG_PATH, 'w') as f:
                 pass
         except Exception as e:
+            logging.error(f"로그 파일 생성 실패: {str(e)}")
             raise Exception(f"로그 파일 생성 실패: {str(e)}")
     
     # 로그 파일에 대한 쓰기 권한 확인
@@ -53,10 +54,12 @@ if LOG_PATH:
         try:
             os.chmod(LOG_PATH, 0o666)  # 모든 사용자에게 쓰기 권한 부여
         except Exception as e:
+            logging.error(f"로그 파일에 대한 쓰기 권한 수정 실패: {str(e)}")
             raise Exception(f"로그 파일에 대한 쓰기 권한 수정 실패: {str(e)}")
     
     # 여전히 쓰기 권한이 없는 경우 예외 발생
     if not os.access(LOG_PATH, os.W_OK):
+        logging.error(f"로그 파일에 대한 쓰기 권한이 없습니다: {LOG_PATH}")
         raise Exception(f"로그 파일에 대한 쓰기 권한이 없습니다: {LOG_PATH}")
 
 # 로거 설정
