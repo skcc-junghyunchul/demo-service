@@ -99,3 +99,7 @@ def initialize_multi_tenant_resource():
             if resource and resource.get("resource_value") is not None:
                 multi_tenant_resource[item] = resource
                 setattr(sys.modules[__name__], item.name, resource)  # ✅ 모듈 속성 등록
+
+# .env 파일에 DATABASE_URL 추가
+with open('.env', 'a') as f:
+    f.write('DATABASE_URL=<your_database_url_here>\n')
