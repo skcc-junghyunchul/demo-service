@@ -4,6 +4,7 @@ import yaml
 import sys
 import logging
 import redis
+import socket
 
 # load .env
 load_dotenv()
@@ -68,6 +69,16 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
+
+# 포트 사용 여부 확인 함수
+def is_port_in_use(port):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(('localhost', port)) == 0
+
+# Redis 포트 사용 여부 확인 및 대체 포트 설정
+if is_port_in_use(NCP_REDIS_PORT):
+    logging.warning(f"포트 {NCP_REDIS_PORT}가 사용 중입니다. 다른 포트를 사용합니다.")
+    NCP_REDIS_PORT += 1  # 포트를 1 증가시켜 사용 가능한 포트로 설정
 
 # Redis 연결 설정 검사
 try:
