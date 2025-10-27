@@ -35,11 +35,8 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
         logger.exception(e,extra={"tenant":company_code})
         return {"error": str(e)}
     finally:
-        del body
-        if chat_history is not None:
-            del chat_history
-        if message is not None:
-            del message
+        # Explicit deletion is unnecessary; Python's garbage collector handles it.
+        pass
 
 
 def parse_user_id(string):
