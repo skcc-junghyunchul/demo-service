@@ -37,11 +37,11 @@ async def download_object_to_stream(company_code, object_name, local_file_path):
             endpoint_url=endpoint_url,
             region_name=region_name,
             aws_access_key_id=access_key,
-            aws_secret_access_key=secret_key
-            # verify=False
+            aws_secret_access_key=secret_key,
+            config=botocore.config.Config(connect_timeout=60, read_timeout=120)  # Increased timeouts
         )
 
-        # 객체 존재 여부 확인
+        # [1mCheck object existence[0m
         try:
             s3.head_object(Bucket=bucket_name, Key=object_name)
         except ClientError as e:
@@ -64,7 +64,7 @@ async def download_object_to_stream(company_code, object_name, local_file_path):
         raise
 
     
-    # object storage 샘플 접속정보
+    # object storage [1msample access information[0m
     # service_name = 's3'
     # endpoint_url = 'https://kr.object.ncloudstorage.com'
     # region_name = 'kr-standard'
