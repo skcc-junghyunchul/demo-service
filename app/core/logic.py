@@ -43,7 +43,19 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
 
 
 def parse_user_id(string):
-    if string is None or string.strip() == "":
+    # 입력 데이터가 문자열인지 확인
+    if not isinstance(string, str):
+        return None
+    
+    # 입력 문자열이 JSON 형식인지 검증
+    try:
+        import json
+        json.loads(string)
+    except json.JSONDecodeError:
+        return None
+    
+    # 기존 로직 유지
+    if string.strip() == "":
         return None
     match = re.search(r'"user_id"\s*:\s*"(\w+)"', string)
     return match.group(1) if match else None
