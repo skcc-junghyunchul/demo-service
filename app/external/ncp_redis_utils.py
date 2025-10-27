@@ -28,6 +28,10 @@ def set_conversation(conversation_id: str, state: str = "", history: dict | None
         if not verify_redis_connection(redis_client):
             raise redis.RedisError("Redis 연결 실패")
 
+        # Redis 메모리 설정 추가
+        redis_client.config_set("maxmemory", "256mb")
+        redis_client.config_set("maxmemory-policy", "allkeys-lru")
+
         redis_client.hset(
             conversation_id, mapping={"state": state, "history": serialized_history}
         )
