@@ -15,6 +15,12 @@ for var in required_env_vars:
     if os.environ.get(var) is None:
         raise Exception(f"필수 환경 변수 '{var}'가 설정되어 있지 않습니다.")
 
+# Redis 설정 추가
+NCP_REDIS_HOST = os.environ.get('NCP_REDIS_HOST')
+if NCP_REDIS_HOST is None or NCP_REDIS_HOST.strip() == "":
+    raise Exception("Redis 설정 오류: 'NCP_REDIS_HOST' 환경 변수가 설정되어 있지 않습니다.")
+NCP_REDIS_HOST = NCP_REDIS_HOST.strip()
+
 # 데이터베이스 URL 설정
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
@@ -32,9 +38,6 @@ WELCOME_MESSAGE_PREFIX =  config_data["misc"]["welcome_message_prefix"].strip()
 
 # 데이터베이스 연결 타임아웃 설정
 DB_TIMEOUT = 30
-
-# from secrets
-NCP_REDIS_HOST = os.environ.get('NCP_REDIS_HOST').strip()
 
 # 로그 파일 경로 설정 추가
 LOG_PATH = os.environ.get('LOG_PATH')
