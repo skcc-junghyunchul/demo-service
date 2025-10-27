@@ -144,10 +144,16 @@ def initialize_multi_tenant_resource():
 
     for enum_class in [LLMType, StorageType, ChitChatType]:
         for item in enum_class.__members__.values():
-            resource = get_multi_resource(item)
-            if resource and resource.get("resource_value") is not None:
-                multi_tenant_resource[item] = resource
-                setattr(sys.modules[__name__], item.name, resource)  # ✅ 모듈 속성 등록
+            try:
+                resource = get_multi_resource(item)
+                if resource and resource.get("resource_value") is not None:
+                    multi_tenant_resource[item] = resource
+                    setattr(sys.modules[__name__], item.name, resource)  # ✅ 모듈 속성 등록
+                else:
+                    logging.warning(f"리소스 초기화 실패: {item.name}에 유효한 리소스 값이 없습니다.")
+            except Exception as e:
+                logging.error(f"리소스 초기화 중 오류 발생: {item.name}, {str(e)}")
+                raise Exception(f"리소스 초기화 중 오류 발생: {item.name}, {str(e)}")
 
     # 추가된 스토리지 설정
     tenant_storage_config = {
