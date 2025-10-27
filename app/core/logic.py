@@ -59,15 +59,17 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
         results = await call_rag_api(query_params={}, body=body)
         
         # Handle edge cases for RAG results
-        if not results or not isinstance(results, dict):
+        if results is None:
+            raise ValueError("RAG results cannot be None")
+        if not isinstance(results, dict):
             return {"error": "Unexpected RAG results format."}
         return results
     
     except ValueError as ve:  
-        logger.exception(ve,extra={"tenant":company_code})
+        logger.exception(ve, extra={"tenant": company_code})
         return {"error": str(ve)}
     except Exception as e:  
-        logger.exception(e,extra={"tenant":company_code})
+        logger.exception(e, extra={"tenant": company_code})
         return {"error": str(e)}
     finally:
         # Explicit deletion is unnecessary; Python's garbage collector handles it.
