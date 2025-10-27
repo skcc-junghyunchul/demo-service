@@ -49,8 +49,8 @@ except Exception as e:
 
 RAG_API_URL = config_data["misc"]["rag_api_url"].strip()
 NCP_REDIS_PORT = config_data["misc"]["ncp_redis_port"]
-NCP_REDIS_DB_CHATHISTORY = config_data["misc"]["ncp_redis_db_chathistory"]
-NCP_REDIS_DB_MULTI_RESOURCE = config_data["misc"].get("ncp_redis_db_multi_resource", 0)
+NCP_REDIS_DB_CHATHISTORY = config_data["misc"].get("ncp_redis_db_chathistory", 0)  # 기본값 0으로 설정
+NCP_REDIS_DB_MULTI_RESOURCE = config_data["misc"].get("ncp_redis_db_multi_resource", 1)  # 기본값 1로 설정
 WELCOME_MESSAGE_PREFIX =  config_data["misc"]["welcome_message_prefix"].strip()
 
 # 데이터베이스 연결 타임아웃 설정
