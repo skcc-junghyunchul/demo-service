@@ -29,7 +29,7 @@ def set_conversation(conversation_id: str, state: str = "", history: dict | None
             raise redis.RedisError("Redis 연결 실패")
 
         # Redis 메모리 설정 추가
-        redis_client.config_set("maxmemory", "512mb")
+        redis_client.config_set("maxmemory", "256mb")
         redis_client.config_set("maxmemory-policy", "allkeys-lru")
 
         # 고유 키 생성
