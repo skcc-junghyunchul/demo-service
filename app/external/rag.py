@@ -5,10 +5,18 @@ import ssl
 import certifi
 import json
 import zlib
+import os
 
 RAG_API_URL = config.RAG_API_URL  # Ensure this URL is correct
+RAG_INDEX_PATH = config.RAG_INDEX_PATH  # Path to the RAG index file
 
 MAX_PAYLOAD_SIZE = 1024 * 1024  # 1 MB
+
+# Ensure the RAG index file is present and accessible
+if not os.path.exists(RAG_INDEX_PATH):
+    raise FileNotFoundError(f"RAG index file not found at path: {RAG_INDEX_PATH}")
+if not os.access(RAG_INDEX_PATH, os.R_OK):
+    raise PermissionError(f"RAG index file is not accessible at path: {RAG_INDEX_PATH}")
 
 async def call_rag_api(
         query_params: Dict[Text, Any] = {},
