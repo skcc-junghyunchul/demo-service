@@ -93,7 +93,9 @@ async def chatbot_scenario(conversation_id, company_code, user_id, user_question
         raise ValueError(f"Invalid company_code: {company_code}")
     
     # llm_resource_value = get_multi_resource(resource_name)
-    llm_resource_value = multi_tenant_resource[resource_name]
+    llm_resource_value = multi_tenant_resource.get(resource_name)
+    if not llm_resource_value:
+        raise ValueError(f"LLM resource not found for company_code: {company_code}")
     # logger.info(f"llm_resource_value: {llm_resource_value}",extra={"tenant":company_code})
     
     
