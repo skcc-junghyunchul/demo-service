@@ -123,6 +123,7 @@ try:
         host=NCP_REDIS_HOST,
         port=NCP_REDIS_PORT,
         db=NCP_REDIS_DB_CHATHISTORY,
+        password=os.environ.get('REDIS_PASSWORD'),  # Redis 비밀번호 추가
         max_connections=10  # pool_size 증가
     )
     redis_client.ping()
