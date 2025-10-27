@@ -32,10 +32,11 @@ def set_conversation(conversation_id: str, state: str = "", history: dict | None
         redis_client.config_set("maxmemory", "512mb")
         redis_client.config_set("maxmemory-policy", "allkeys-lru")
 
-        redis_client.hset(
-            conversation_id, mapping={"state": state, "history": serialized_history}
-        )
-        redis_client.expire(conversation_id, 1800)  # 30분 후 만료
+        # 고유 키 생성
+        unique_key = f"conversation:{conversation_id}"
+
+        redis_client.set(unique_key, json.dumps({"state": state, "history": serialized_history}))
+        redis_client.expire(unique_key, 1800)  # 30분 후 만료
     except (redis.RedisError, ValueError) as e:
         logger.exception(f"Redis 저장 중 오류 발생: {e}")
 
@@ -58,7 +59,12 @@ def update_conversation(
             if not verify_redis_connection(redis_client):
                 raise redis.RedisError("Redis 연결 실패")
 
-            data = get_conversation(conversation_id) or {"state": "", "history": []}
+            unique_key = f"conversation:{conversation_id}"
+            data = redis_client.get(unique_key)
+            if data:
+                data = json.loads(data)
+            else:
+                data = {"state": "", "history": []}
 
             if state is not None:
                 data["state"] = state
