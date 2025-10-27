@@ -4,6 +4,23 @@ from app.external.rag import call_rag_api
 from app.models.rag import Rag
 from app import logger
 from app.models.message import Message
+import subprocess
+
+# Check aiohttp version and update if necessary
+def check_and_update_aiohttp():
+    try:
+        import pkg_resources
+        current_version = pkg_resources.get_distribution("aiohttp").version
+        print(f"Current aiohttp version: {current_version}")
+        
+        # Update aiohttp to the latest version
+        subprocess.run(["pip", "install", "--upgrade", "aiohttp"], check=True)
+        print("aiohttp has been updated to the latest version.")
+    except Exception as e:
+        logger.exception(e)
+        print(f"Failed to check or update aiohttp: {e}")
+
+check_and_update_aiohttp()
 
 async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, company_code=None, user_id=None, message:Message=None):
     
