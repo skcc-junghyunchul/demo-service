@@ -56,7 +56,11 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
         body["is_clear"] = is_clear
         
     try:
-        results = await call_rag_api(query_params={}, body=body)
+        try:
+            results = await call_rag_api(query_params={}, body=body)
+        except Exception as e:
+            logger.error(f"Exception occurred: {e}")
+            results = None
         
         # Handle edge cases for RAG results
         if results is None:
