@@ -26,6 +26,10 @@ async def send_message(message: Message):
         if not message.conversation_id:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="conversation_id is required")
 
+        # Ensure user_id is initialized
+        if not message.user_id:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="user_id is required")
+
         conversation_id = message.conversation_id
         user_question = message.message
         company_code = message.company_code
@@ -37,6 +41,9 @@ async def send_message(message: Message):
 
         # 회사코드 + conversation_id 결합
         unique_id = f"{company_code}_{conversation_id}"
+
+        # 사용자 식별 로직 추가
+        logger.info(f"Identifying user with ID: {user_id}")
 
         # Run chatbot scenario
         response = await chatbot_scenario(unique_id, company_code, user_id, user_question, message)
