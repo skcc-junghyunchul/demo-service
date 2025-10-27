@@ -73,7 +73,7 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
         return {"error": "Client error occurred while processing the request."}
     except Exception as e:  
         logger.exception(e, extra={"tenant": company_code})
-        return {"error": str(e)}
+        return {"error": "An unexpected issue occurred. Please try again later."}
 
 
 def parse_user_id(string):
