@@ -2,19 +2,25 @@ import json
 import redis
 import config as config
 
+def validate_redis_data(data):
+    """
+    Validate the Redis data format.
+    Returns True if valid, raises ValueError otherwise.
+    """
+    if not isinstance(data, dict):
+        raise ValueError("Redis data must be a dictionary.")
+    return True
 
-
-# NCP_REDIS_HOST = config.NCP_REDIS_HOST
-# NCP_REDIS_PORT = config.NCP_REDIS_PORT
-# NCP_REDIS_DB = config.NCP_REDIS_DB
-    
-# Redis 클라이언트 초기화
-# redis_client: redis.Redis = redis.Redis(
-#     host=NCP_REDIS_HOST,
-#     port=NCP_REDIS_PORT,
-#     db=NCP_REDIS_DB,
-#     decode_responses=True # 추가
-# )
+def save_to_redis(client: redis.Redis, key: str, data: dict):
+    """
+    Save validated data to Redis.
+    """
+    try:
+        validate_redis_data(data)
+        client.set(key, json.dumps(data))
+    except ValueError as e:
+        print(f"Error saving data to Redis: {e}")
+        raise
 
 def get_redis_client(db: int) -> redis.Redis:
     return redis.Redis(
