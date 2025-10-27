@@ -18,7 +18,8 @@ for var in required_env_vars:
 # Redis 설정 추가
 NCP_REDIS_HOST = os.environ.get('NCP_REDIS_HOST')
 if NCP_REDIS_HOST is None or NCP_REDIS_HOST.strip() == "":
-    raise Exception("Redis 설정 오류: 'NCP_REDIS_HOST' 환경 변수가 설정되어 있지 않습니다.")
+    logging.warning("Redis 설정 오류: 'NCP_REDIS_HOST' 환경 변수가 설정되어 있지 않습니다. 기본값 'localhost'를 사용합니다.")
+    NCP_REDIS_HOST = "localhost"
 NCP_REDIS_HOST = NCP_REDIS_HOST.strip()
 
 # 데이터베이스 URL 설정
