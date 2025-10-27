@@ -1,7 +1,5 @@
 from app import logger
 
-
-
 def chat_history_parser(chat_history, company_code):
     """
     {
@@ -13,10 +11,18 @@ def chat_history_parser(chat_history, company_code):
     converted_history = []
 
     for history in chat_history:
+        if not isinstance(history, dict):
+            logger.error(f"Invalid history format: {history}")
+            continue  # Skip invalid history entries
+
         for key in history:
             value = history.get(key)
 
             if key == "user":
+                if not isinstance(value, str):
+                    logger.error(f"Invalid user content format: {value}")
+                    continue  # Skip invalid user content
+
                 converted_history.append({
                     "role": key,
                     "content": value,
@@ -31,6 +37,10 @@ def chat_history_parser(chat_history, company_code):
 
                     answer = data.get("answer")
                     answer_type = data.get("answer_type")
+
+                    if not isinstance(answer, str) or not isinstance(answer_type, str):
+                        logger.error(f"Invalid agent response format: answer={answer}, answer_type={answer_type}")
+                        continue  # Skip invalid agent responses
 
                     converted_history.append({
                         "role": key,
