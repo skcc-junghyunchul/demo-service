@@ -8,7 +8,15 @@ from app.external.ncp_redis_utils import set_conversation, get_conversation, upd
 from app.core.logic import remove_prefix_tag
 from app import logger
 
-router = APIRouter(prefix="/v1/conversation")
+# Validation for router prefix
+def validate_router_prefix(prefix: str):
+    if not prefix.startswith("/v1"):
+        raise ValueError("Router prefix must start with '/v1'")
+
+# Validate and set router prefix
+router_prefix = "/v1/conversation"
+validate_router_prefix(router_prefix)
+router = APIRouter(prefix=router_prefix)
 
 
 @router.post("/{api_key}/message")
