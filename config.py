@@ -26,9 +26,25 @@ NCP_REDIS_HOST = NCP_REDIS_HOST.strip()
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 try:
+    # 설정 파일 존재 여부 확인
+    if not os.path.exists("/home/config.yaml"):
+        raise FileNotFoundError("설정 파일 '/home/config.yaml'이 존재하지 않습니다.")
+    
+    # 설정 파일 읽기 가능 여부 확인
+    if not os.access("/home/config.yaml", os.R_OK):
+        raise PermissionError("설정 파일 '/home/config.yaml'에 대한 읽기 권한이 없습니다.")
+    
+    # 설정 파일 로드
     with open("/home/config.yaml", 'r', encoding='utf-8') as f:
         config_data = yaml.safe_load(f)
+except FileNotFoundError as e:
+    logging.error(str(e))
+    raise Exception(str(e))
+except PermissionError as e:
+    logging.error(str(e))
+    raise Exception(str(e))
 except Exception as e:
+    logging.error(f"설정 파일 '/home/config.yaml' 로드 실패: {str(e)}")
     raise Exception(f"설정 파일 '/home/config.yaml' 로드 실패: {str(e)}")
 
 RAG_API_URL = config_data["misc"]["rag_api_url"].strip()
