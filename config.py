@@ -158,3 +158,8 @@ def initialize_multi_tenant_resource():
 # .env 파일에 DATABASE_URL 추가
 with open('.env', 'a') as f:
     f.write('DATABASE_URL=<your_database_url_here>\n')
+
+# 추가된 NCP_REDIS_HOST 설정
+if 'NCP_REDIS_HOST' not in os.environ:
+    os.environ['NCP_REDIS_HOST'] = 'localhost'
+    logging.info("NCP_REDIS_HOST 환경 변수가 설정되지 않아 기본값 'localhost'로 설정되었습니다.")
