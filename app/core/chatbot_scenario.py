@@ -29,6 +29,10 @@ def validate_input(conversation_id, company_code, user_id, user_question):
         if not re.match(r"^/welcome\s+\w+$", user_question):
             raise ValueError("Invalid user_question format for welcome message.")
 
+def validate_input_data(input_data):
+    if not isinstance(input_data, dict):
+        raise ValueError("Invalid input format: input_data must be a dictionary.")
+
 def parse_response(response):
     try:
         parsed_response = json.loads(response)
@@ -45,6 +49,19 @@ async def chatbot_scenario(conversation_id, company_code, user_id, user_question
         validate_input(conversation_id, company_code, user_id, user_question)
     except ValueError as e:
         logger.error(f"Input validation error: {e}")
+        return {"error": str(e)}
+
+    # Validate input data
+    input_data = {
+        "conversation_id": conversation_id,
+        "company_code": company_code,
+        "user_id": user_id,
+        "user_question": user_question
+    }
+    try:
+        validate_input_data(input_data)
+    except ValueError as e:
+        logger.error(f"Input data validation error: {e}")
         return {"error": str(e)}
 
     messages = []
