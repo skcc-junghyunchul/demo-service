@@ -22,7 +22,11 @@ async def call_rag_api(
     
     method_type = "post"
 
-    async with aiohttp.ClientSession() as session:
+    # Create SSL context
+    ssl_context = ssl.create_default_context()
+    ssl_context.load_verify_locations(certifi.where())
+
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=ssl_context)) as session:
         method = getattr(session, method_type)
         async with method(
             url=RAG_API_URL,
