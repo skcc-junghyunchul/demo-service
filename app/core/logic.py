@@ -56,11 +56,7 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
         body["is_clear"] = is_clear
         
     try:
-        try:
-            results = await call_rag_api(query_params={}, body=body)
-        except Exception as e:
-            logger.error(f"Exception occurred: {e}")
-            results = None
+        results = await call_rag_api(query_params={}, body=body)
         
         # Handle edge cases for RAG results
         if results is None:
@@ -72,12 +68,12 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
     except ValueError as ve:  
         logger.exception(ve, extra={"tenant": company_code})
         return {"error": str(ve)}
+    except aiohttp.ClientError as ce:
+        logger.error(f"Client error occurred while calling RAG API: {ce}")
+        return {"error": "Client error occurred while processing the request."}
     except Exception as e:  
         logger.exception(e, extra={"tenant": company_code})
         return {"error": str(e)}
-    finally:
-        # Explicit deletion is unnecessary; Python's garbage collector handles it.
-        pass
 
 
 def parse_user_id(string):
