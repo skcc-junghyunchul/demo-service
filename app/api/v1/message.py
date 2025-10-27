@@ -51,7 +51,7 @@ async def send_message(message: Message):
         response = await chatbot_scenario(unique_id, company_code, user_id, user_question, message)
 
         # 첫번째 text 후에는 history가 없음
-        conversation = get_conversation(unique_id)
+        conversation = await get_conversation(unique_id)
 
         # Conversation이 있으면
         if conversation:
