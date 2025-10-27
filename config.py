@@ -24,6 +24,10 @@ NCP_REDIS_HOST = NCP_REDIS_HOST.strip()
 
 # 데이터베이스 URL 설정
 DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL is None or DATABASE_URL.strip() == "":
+    logging.warning("데이터베이스 설정 오류: 'DATABASE_URL' 환경 변수가 설정되어 있지 않습니다. 기본값 'sqlite:///default.db'를 사용합니다.")
+    DATABASE_URL = "sqlite:///default.db"
+DATABASE_URL = DATABASE_URL.strip()
 
 # 설정 파일 경로 환경 변수로 변경
 CONFIG_FILE_PATH = os.environ.get('CONFIG_FILE_PATH')
