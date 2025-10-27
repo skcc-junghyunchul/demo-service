@@ -8,6 +8,10 @@ from openai import BadRequestError, OpenAIError
 from app import logger
 from app.models.message import Message
 
+# Define a constant for API timeout
+API_TIMEOUT = 30  # Increased timeout value
+MAX_RETRIES = 3  # Maximum number of retries
+
 async def query_openai(user_question, llm_resource_value, company_code, message: Message):
     if message is None:
         raise ValueError('Message cannot be None')
@@ -26,7 +30,8 @@ async def query_openai(user_question, llm_resource_value, company_code, message:
 
     client = OpenAI(
         base_url=A_X_API_URL,
-        api_key=A_X_API_KEY
+        api_key=A_X_API_KEY,
+        timeout=API_TIMEOUT  # Set timeout
     )
 
     messages = [
@@ -52,31 +57,38 @@ async def query_openai(user_question, llm_resource_value, company_code, message:
         }
     ]
 
-    try:
-        chat_completion = client.chat.completions.create(
-            model=A_X_GEM_MODEL_NAME,
-            messages=messages,
-            temperature=0.0,
-            max_tokens=100,
-            tools=None,
-            tool_choice=None,
-            extra_headers={
-                "aip-app-id": A_X_APP_ID,
-                "aip-chat-id": A_X_CHAT_ID,
-                "aip-company": A_X_COMPANY,
-                "aip-department": A_X_DEPARTMENT,
-                "aip-user": A_X_USER,
-                "aip-transaction-id": A_X_TRANSACTION_ID,
-            },
-        )
-    except BadRequestError as bre:
-        logger.error(f"BadRequestError: {bre}")
-        raise ContentFilteringError
-    except OpenAIError as oe:
-        logger.error(f"OpenAIError: {oe}")
-        raise RuntimeError("An error occurred while querying OpenAI.")
-    except Exception as e:
-        logger.error(f"Unexpected error: {e}")
-        raise RuntimeError("An unexpected error occurred.")
-
-    return chat_completion.choices[0].message.content
+    retries = 0
+    while retries < MAX_RETRIES:
+        try:
+            chat_completion = client.chat.completions.create(
+                model=A_X_GEM_MODEL_NAME,
+                messages=messages,
+                temperature=0.0,
+                max_tokens=100,
+                tools=None,
+                tool_choice=None,
+                extra_headers={
+                    "aip-app-id": A_X_APP_ID,
+                    "aip-chat-id": A_X_CHAT_ID,
+                    "aip-company": A_X_COMPANY,
+                    "aip-department": A_X_DEPARTMENT,
+                    "aip-user": A_X_USER,
+                    "aip-transaction-id": A_X_TRANSACTION_ID,
+                },
+            )
+            return chat_completion.choices[0].message.content
+        except BadRequestError as bre:
+            logger.error(f"BadRequestError: {bre}")
+            raise ContentFilteringError
+        except OpenAIError as oe:
+            logger.error(f"OpenAIError: {oe}")
+            retries += 1
+            logger.info(f"Retrying... ({retries}/{MAX_RETRIES})")
+            if retries >= MAX_RETRIES:
+                raise RuntimeError("An error occurred while querying OpenAI after multiple retries.")
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
+            retries += 1
+            logger.info(f"Retrying... ({retries}/{MAX_RETRIES})")
+            if retries >= MAX_RETRIES:
+                raise RuntimeError("An unexpected error occurred after multiple retries.")
