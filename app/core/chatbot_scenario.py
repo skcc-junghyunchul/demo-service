@@ -70,5 +70,22 @@ async def chatbot_scenario(conversation_id, company_code, user_id, user_question
             return parsed_response
         else:
             update_conversation(conversation_id, "continuing")
+            response = await response_generator(conversation_id, user_question, "상태 지속", message=message)
+            parsed_response = parse_response(response)
+            return parsed_response
 
-    # 기타 로직은 기존 코드 유지
+    # 기타 상태 처리
+    if state == "awaiting_resolution":
+        response = await response_generator(conversation_id, user_question, "상담 진행 중", message=message)
+        parsed_response = parse_response(response)
+        update_conversation(conversation_id, "in_progress")
+        return parsed_response
+
+    if state == "finished":
+        return {"message": "Conversation has already been finished."}
+
+    # 기본 상태 처리
+    response = await response_generator(conversation_id, user_question, "기본 상태", message=message)
+    parsed_response = parse_response(response)
+    update_conversation(conversation_id, "default")
+    return parsed_response
