@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, HTTPException, Request, status
 from pydantic import BaseModel
 import redis.asyncio as redis
@@ -8,6 +9,9 @@ from app.external.ncp_redis_utils import set_conversation, get_conversation, upd
 from app.core.logic import remove_prefix_tag
 from app import logger
 import hashlib
+
+# Configure logger
+logging.basicConfig(level=logging.INFO)
 
 # Validation for router prefix
 def validate_router_prefix(prefix: str):
