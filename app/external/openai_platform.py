@@ -12,6 +12,9 @@ from app.models.message import Message
 API_TIMEOUT = 30  # Increased timeout value
 MAX_RETRIES = 3  # Maximum number of retries
 
+# Define available models
+available_models = ["gpt-3.5-turbo", "gpt-4"]
+
 async def query_openai(user_question, llm_resource_value, company_code, message: Message):
     if message is None:
         raise ValueError('Message cannot be None')
@@ -26,6 +29,10 @@ async def query_openai(user_question, llm_resource_value, company_code, message:
     if not A_X_GEM_MODEL_NAME:
         logger.error("Model name is missing in resource_value.")
         raise ValueError("Model name cannot be None or empty.")
+
+    # Validate model availability
+    if A_X_GEM_MODEL_NAME not in available_models:
+        raise ValueError(f"Model '{A_X_GEM_MODEL_NAME}' not found. Available models are: {available_models}")
 
     A_X_APP_ID = message.aip_app_id
     A_X_CHAT_ID = message.aip_chat_id
