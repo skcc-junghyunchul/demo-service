@@ -21,6 +21,12 @@ async def query_openai(user_question, llm_resource_value, company_code, message:
     A_X_API_URL = resource_value_dict.get('A_X_API_URL')
     A_X_API_KEY = resource_value_dict.get('A_X_API_KEY')
     A_X_GEM_MODEL_NAME = resource_value_dict.get('A_X_GEM_MODEL_NAME')
+
+    # Verify and update model name or path
+    if not A_X_GEM_MODEL_NAME:
+        logger.error("Model name is missing in resource_value.")
+        raise ValueError("Model name cannot be None or empty.")
+
     A_X_APP_ID = message.aip_app_id
     A_X_CHAT_ID = message.aip_chat_id
     A_X_COMPANY = company_code
