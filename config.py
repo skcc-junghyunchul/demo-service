@@ -131,6 +131,13 @@ def initialize_multi_tenant_resource():
                 multi_tenant_resource[item] = resource
                 setattr(sys.modules[__name__], item.name, resource)  # ✅ 모듈 속성 등록
 
+    # 추가된 스토리지 설정
+    tenant_storage_config = {
+        "default_storage": "s3",
+        "backup_storage": "gcs"
+    }
+    multi_tenant_resource["tenant_storage"] = tenant_storage_config
+
 # .env 파일에 DATABASE_URL 추가
 with open('.env', 'a') as f:
     f.write('DATABASE_URL=<your_database_url_here>\n')
