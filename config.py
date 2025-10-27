@@ -10,7 +10,7 @@ import socket
 load_dotenv()
 
 # 필수 환경 변수 확인
-required_env_vars = ['NCP_REDIS_HOST', 'LOG_PATH', 'DATABASE_URL']
+required_env_vars = ['NCP_REDIS_HOST', 'LOG_PATH', 'DATABASE_URL', 'CONFIG_FILE_PATH']
 for var in required_env_vars:
     if os.environ.get(var) is None:
         raise Exception(f"필수 환경 변수 '{var}'가 설정되어 있지 않습니다.")
@@ -25,17 +25,27 @@ NCP_REDIS_HOST = NCP_REDIS_HOST.strip()
 # 데이터베이스 URL 설정
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
+# 설정 파일 경로 환경 변수로 변경
+CONFIG_FILE_PATH = os.environ.get('CONFIG_FILE_PATH')
+if CONFIG_FILE_PATH is None or CONFIG_FILE_PATH.strip() == "":
+    raise Exception("'CONFIG_FILE_PATH' 환경 변수가 설정되어 있지 않습니다.")
+CONFIG_FILE_PATH = CONFIG_FILE_PATH.strip()
+
 try:
     # 설정 파일 존재 여부 확인
-    if not os.path.exists("/home/config.yaml"):
-        raise FileNotFoundError("설정 파일 '/home/config.yaml'이 존재하지 않습니다.")
+    if not os.path.exists(CONFIG_FILE_PATH):
+        raise FileNotFoundError(f"설정 파일 '{CONFIG_FILE_PATH}'이 존재하지 않습니다.")
     
     # 설정 파일 읽기 가능 여부 확인
-    if not os.access("/home/config.yaml", os.R_OK):
-        raise PermissionError("설정 파일 '/home/config.yaml'에 대한 읽기 권한이 없습니다.")
+    if not os.access(CONFIG_FILE_PATH, os.R_OK):
+        raise PermissionError(f"설정 파일 '{CONFIG_FILE_PATH}'에 대한 읽기 권한이 없습니다.")
+    
+    # 설정 파일 형식 확인
+    if not CONFIG_FILE_PATH.endswith('.yaml'):
+        raise ValueError(f"설정 파일 '{CONFIG_FILE_PATH}'은 YAML 형식이 아닙니다.")
     
     # 설정 파일 로드
-    with open("/home/config.yaml", 'r', encoding='utf-8') as f:
+    with open(CONFIG_FILE_PATH, 'r', encoding='utf-8') as f:
         config_data = yaml.safe_load(f)
 except FileNotFoundError as e:
     logging.error(str(e))
@@ -43,9 +53,12 @@ except FileNotFoundError as e:
 except PermissionError as e:
     logging.error(str(e))
     raise Exception(str(e))
+except ValueError as e:
+    logging.error(str(e))
+    raise Exception(str(e))
 except Exception as e:
-    logging.error(f"설정 파일 '/home/config.yaml' 로드 실패: {str(e)}")
-    raise Exception(f"설정 파일 '/home/config.yaml' 로드 실패: {str(e)}")
+    logging.error(f"설정 파일 '{CONFIG_FILE_PATH}' 로드 실패: {str(e)}")
+    raise Exception(f"설정 파일 '{CONFIG_FILE_PATH}' 로드 실패: {str(e)}")
 
 RAG_API_URL = config_data["misc"]["rag_api_url"].strip()
 NCP_REDIS_PORT = config_data["misc"]["ncp_redis_port"]
