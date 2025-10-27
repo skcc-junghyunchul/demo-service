@@ -23,6 +23,14 @@ def check_and_update_aiohttp():
 check_and_update_aiohttp()
 
 async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, company_code=None, user_id=None, message:Message=None):
+    # Validate input data
+    if not user_question or not isinstance(user_question, str):
+        return {"error": "Invalid user_question provided."}
+    if category is not None and not isinstance(category, str):
+        return {"error": "Invalid category provided."}
+    if is_clear is not None and not isinstance(is_clear, bool):
+        return {"error": "Invalid is_clear value provided."}
+
     # Ensure all required AIP fields are initialized
     message.aip_app_id = message.aip_app_id or "default_app_id"
     message.aip_chat_id = message.aip_chat_id or "default_chat_id"
@@ -49,6 +57,10 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
         
     try:
         results = await call_rag_api(query_params={}, body=body)
+        
+        # Handle edge cases for RAG results
+        if not results or not isinstance(results, dict):
+            return {"error": "Unexpected RAG results format."}
         return results
     
     except ValueError as ve:  
