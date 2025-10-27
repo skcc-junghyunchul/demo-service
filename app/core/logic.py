@@ -23,7 +23,13 @@ def check_and_update_aiohttp():
 check_and_update_aiohttp()
 
 async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, company_code=None, user_id=None, message:Message=None):
-    
+    # Ensure all required AIP fields are initialized
+    message.aip_app_id = message.aip_app_id or "default_app_id"
+    message.aip_chat_id = message.aip_chat_id or "default_chat_id"
+    message.aip_department = message.aip_department or "default_department"
+    message.user_id = message.user_id or "default_user_id"
+    message.aip_transaction_id = message.aip_transaction_id or "default_transaction_id"
+
     body = {
         "user_question": user_question,
         "chat_history": chat_history,
