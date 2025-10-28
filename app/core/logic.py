@@ -30,6 +30,10 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
         return {"error": "Invalid category provided."}
     if is_clear is not None and not isinstance(is_clear, bool):
         return {"error": "Invalid is_clear value provided."}
+    if not isinstance(message, Message):
+        return {"error": "Invalid message object provided."}
+    if company_code is not None and not isinstance(company_code, str):
+        return {"error": "Invalid company_code provided."}
 
     # Ensure all required AIP fields are initialized
     message.aip_app_id = message.aip_app_id or "default_app_id"
@@ -37,6 +41,10 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
     message.aip_department = message.aip_department or "default_department"
     message.user_id = message.user_id or "default_user_id"
     message.aip_transaction_id = message.aip_transaction_id or "default_transaction_id"
+
+    # Validate configuration before constructing the RAG body
+    if not message.aip_app_id or not message.aip_chat_id or not message.aip_department or not message.user_id or not message.aip_transaction_id:
+        return {"error": "Missing required configuration for RAG body construction."}
 
     body = {
         "user_question": user_question,
