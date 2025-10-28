@@ -35,7 +35,7 @@ async def get_file(object_storage: ObjectStorage):
         company_code = object_storage.company_code
         object_name = object_storage.object_name
         local_file_path = object_storage.local_file_path
-        service_name = object_storage.service_name  # Assuming service_name is part of ObjectStorage
+        service_name = object_storage.service_name if object_storage.service_name else 'valid_service'  # Default value
 
         # Validate service_name
         validate_service_name(service_name)
@@ -93,7 +93,7 @@ async def uploadfile(object_storage: ObjectStorage):
         company_code = object_storage.company_code
         object_name = object_storage.object_name
         local_file_path = object_storage.local_file_path
-        service_name = object_storage.service_name  # Assuming service_name is part of ObjectStorage
+        service_name = object_storage.service_name if object_storage.service_name else 'valid_service'  # Default value
 
         # Validate service_name
         validate_service_name(service_name)
