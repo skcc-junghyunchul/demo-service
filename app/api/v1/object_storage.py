@@ -11,7 +11,10 @@ import asyncio
 
 def validate_service_name(service_name: str) -> bool:
     # Example validation logic
-    return service_name in ["service1", "service2", "service3"]
+    valid_names = ["service1", "service2", "service3"]
+    if service_name not in valid_names:
+        raise ValueError(f"Invalid service_name: {service_name}. Must be one of {valid_names}.")
+    return True
 
 router = APIRouter(prefix="/api/v1")
 
@@ -35,8 +38,7 @@ async def get_file(object_storage: ObjectStorage):
         service_name = object_storage.service_name  # Assuming service_name is part of ObjectStorage
 
         # Validate service_name
-        if not validate_service_name(service_name):
-            raise ValueError("Invalid service_name")
+        validate_service_name(service_name)
 
         # Implement retry logic for stream operations
         file_stream, mime_type = await retry_operation(
@@ -94,8 +96,7 @@ async def uploadfile(object_storage: ObjectStorage):
         service_name = object_storage.service_name  # Assuming service_name is part of ObjectStorage
 
         # Validate service_name
-        if not validate_service_name(service_name):
-            raise ValueError("Invalid service_name")
+        validate_service_name(service_name)
         
         await upload_file(company_code, object_name, local_file_path)
         
