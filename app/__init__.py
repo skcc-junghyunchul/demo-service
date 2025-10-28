@@ -48,7 +48,7 @@ console_handler.setFormatter(formatter)
 logger_provider = LoggerProvider(
     resource=Resource.create(
         {
-            "service.instance.id": os.uname().nodename,
+            "service.instance.id": generate_instance_id(),
         }
     ),
 )
