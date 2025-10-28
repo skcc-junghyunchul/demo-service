@@ -23,10 +23,19 @@ router_prefix = "/v1/conversation"
 validate_router_prefix(router_prefix)
 router = APIRouter(prefix=router_prefix)
 
+# Allowed methods
+ALLOWED_METHODS = ["POST"]
+
+def validate_method(method: str):
+    if method not in ALLOWED_METHODS:
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail=f"Method {method} is not allowed")
 
 @router.post("/{api_key}/message")
 async def send_message(message: Message):
     try:
+        # Validate method
+        validate_method("POST")
+
         # Ensure conversation_id is initialized
         if not message.conversation_id:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="conversation_id is required")
