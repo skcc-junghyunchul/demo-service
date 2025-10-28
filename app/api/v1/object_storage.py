@@ -9,6 +9,10 @@ from app.external.object_storage import download_object_to_stream, create_bucket
 from app.enums.storage_resource import StorageType
 import asyncio
 
+def validate_service_name(service_name: str) -> bool:
+    # Example validation logic
+    return service_name in ["service1", "service2", "service3"]
+
 router = APIRouter(prefix="/api/v1")
 
 async def retry_operation(operation, retries=3, delay=2, *args, **kwargs):
@@ -28,7 +32,12 @@ async def get_file(object_storage: ObjectStorage):
         company_code = object_storage.company_code
         object_name = object_storage.object_name
         local_file_path = object_storage.local_file_path
-        
+        service_name = object_storage.service_name  # Assuming service_name is part of ObjectStorage
+
+        # Validate service_name
+        if not validate_service_name(service_name):
+            raise ValueError("Invalid service_name")
+
         # Implement retry logic for stream operations
         file_stream, mime_type = await retry_operation(
             download_object_to_stream, 
@@ -82,6 +91,11 @@ async def uploadfile(object_storage: ObjectStorage):
         company_code = object_storage.company_code
         object_name = object_storage.object_name
         local_file_path = object_storage.local_file_path
+        service_name = object_storage.service_name  # Assuming service_name is part of ObjectStorage
+
+        # Validate service_name
+        if not validate_service_name(service_name):
+            raise ValueError("Invalid service_name")
         
         await upload_file(company_code, object_name, local_file_path)
         
