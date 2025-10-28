@@ -36,11 +36,10 @@ if CONFIG_FILE_PATH is None or CONFIG_FILE_PATH.strip() == "":
 CONFIG_FILE_PATH = CONFIG_FILE_PATH.strip()
 
 try:
-    # 설정 파일 존재 여부 확인
+    # 설정 파일 존재 여부 및 읽기 권한 확인
     if not os.path.exists(CONFIG_FILE_PATH):
         raise FileNotFoundError(f"설정 파일 '{CONFIG_FILE_PATH}'이 존재하지 않습니다.")
     
-    # 설정 파일 읽기 가능 여부 확인
     if not os.access(CONFIG_FILE_PATH, os.R_OK):
         raise PermissionError(f"설정 파일 '{CONFIG_FILE_PATH}'에 대한 읽기 권한이 없습니다.")
     
@@ -51,13 +50,7 @@ try:
     # 설정 파일 로드
     with open(CONFIG_FILE_PATH, 'r', encoding='utf-8') as f:
         config_data = yaml.safe_load(f)
-except FileNotFoundError as e:
-    logging.error(str(e))
-    raise Exception(str(e))
-except PermissionError as e:
-    logging.error(str(e))
-    raise Exception(str(e))
-except ValueError as e:
+except (FileNotFoundError, PermissionError, ValueError) as e:
     logging.error(str(e))
     raise Exception(str(e))
 except Exception as e:
