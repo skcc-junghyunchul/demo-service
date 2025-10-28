@@ -53,6 +53,10 @@ logger_provider = LoggerProvider(
     ),
 )
 
+# Ensure the service instance ID is set and verified during initialization
+if not logger_provider.resource.attributes.get("service.instance.id"):
+    raise ValueError("Service instance ID missing")
+
 # OTLP Exporter
 otlp_exporter = OTLPLogExporter(endpoint="http://grafana-alloy.grafana-alloy:4317", insecure=True)
 logger_provider.add_log_record_processor(BatchLogRecordProcessor(otlp_exporter, max_export_batch_size=512, schedule_delay_millis=5000, export_timeout_millis=30000))
