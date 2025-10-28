@@ -8,7 +8,7 @@ from app.core.chatbot_scenario import chatbot_scenario
 from app.external.ncp_redis_utils import set_conversation, get_conversation, update_conversation, delete_conversation
 from app.core.logic import remove_prefix_tag
 from app import logger
-import hashlib
+import uuid
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
@@ -44,9 +44,8 @@ async def send_message(message: Message):
         user_question = remove_prefix_tag(user_question)
         logger.info(f"user_input: {user_question}")
 
-        # 회사코드 + conversation_id + user_id 결합 및 해싱 적용
-        unique_id_raw = f"{company_code}_{conversation_id}_{user_id}"
-        unique_id = hashlib.sha256(unique_id_raw.encode()).hexdigest()
+        # 회사코드 + conversation_id + user_id 결합 및 UUID 생성
+        unique_id = str(uuid.uuid4())
 
         # 사용자 식별 로직 추가
         logger.info(f"Identifying user with ID: {user_id}")
