@@ -104,4 +104,7 @@ def parse_user_id(string):
 
 
 def remove_prefix_tag(text):
+    # 텍스트 인코딩을 UTF-8로 변환
+    if isinstance(text, str):
+        text = text.encode('utf-8').decode('utf-8')
     return re.sub(r'^<[^>]+>\s*', '', text)
