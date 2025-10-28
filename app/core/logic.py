@@ -22,6 +22,13 @@ def check_and_update_aiohttp():
 
 check_and_update_aiohttp()
 
+def validate_rag_params(params):
+    required_keys = ["user_question", "aip_app_id", "aip_chat_id", "aip_department", "aip_user", "aip_transaction_id"]
+    for key in required_keys:
+        if key not in params or not params[key]:
+            return False
+    return True
+
 async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, company_code=None, user_id=None, message:Message=None):
     # Validate input data
     if not user_question or not isinstance(user_question, str):
@@ -42,10 +49,7 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
     message.user_id = message.user_id or "default_user_id"
     message.aip_transaction_id = message.aip_transaction_id or "default_transaction_id"
 
-    # Validate configuration before constructing the RAG body
-    if not message.aip_app_id or not message.aip_chat_id or not message.aip_department or not message.user_id or not message.aip_transaction_id:
-        return {"error": "Missing required configuration for RAG body construction."}
-
+    # Construct the RAG body
     body = {
         "user_question": user_question,
         "chat_history": chat_history,
@@ -62,6 +66,10 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
     
     if is_clear is not None:
         body["is_clear"] = is_clear
+
+    # Validate RAG body parameters before construction
+    if not validate_rag_params(body):
+        raise ValueError('Invalid RAG parameters')
         
     try:
         results = await call_rag_api(query_params={}, body=body)
