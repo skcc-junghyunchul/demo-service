@@ -61,7 +61,10 @@ async def call_rag_api(
     ssl_context = ssl.create_default_context()
     ssl_context.load_verify_locations(certifi.where())
 
-    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=ssl_context)) as session:
+    # Increase concurrency limit
+    connector = aiohttp.TCPConnector(ssl=ssl_context, limit=100)  # Set concurrency limit to 100
+
+    async with aiohttp.ClientSession(connector=connector) as session:
         method = getattr(session, method_type)
         try:
             async with method(
