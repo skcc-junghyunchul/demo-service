@@ -35,9 +35,17 @@ COMMON = "common"
 # 커스텀 포멧 코드의 기본값 셋팅을 위한 필터 정의
 class UserFilter(logging.Filter):
     def filter(self, record):
+        # 테넌트 유효성 검사 추가
         if not hasattr(record, "tenant"):
             record.tenant = COMMON  # 기본값 설정
+        elif not self.is_valid_tenant(record.tenant):
+            raise ValueError(f"Invalid tenant: {record.tenant}")
         return True
+
+    @staticmethod
+    def is_valid_tenant(tenant):
+        # 테넌트 이름이 알파벳과 숫자로만 구성되어 있는지 확인
+        return bool(re.match(r"^[a-zA-Z0-9_-]+$", tenant))
 
 formatter = DefaultFormatter("%(asctime)s - %(tenant)s - %(module)s - %(name)s - %(levelname)s - %(message)s")
 file_formatter = DefaultFormatter("%(asctime)s - %(tenant)s - %(module)s - %(name)s - %(levelname)s - %(message)s")
