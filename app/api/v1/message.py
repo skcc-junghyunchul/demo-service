@@ -87,6 +87,9 @@ async def send_message(message: Message):
             # 업데이트
             set_conversation(unique_id, state=state, history=history)
 
+        # Convert response to JSON serializable format
+        response = json.dumps(response, default=str)
+
         return response
 
     except Exception as e:
