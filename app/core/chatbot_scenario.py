@@ -75,6 +75,9 @@ async def chatbot_scenario(conversation_id, company_code, user_id, user_question
     if active_conversations is None:
         raise ValueError("Active conversations object is None")
 
+    if 'state' not in active_conversations:
+        raise ValueError("Active conversations object does not contain 'state' key")
+
     state = active_conversations['state']
 
     # 해결여부 확인 분기 처리
