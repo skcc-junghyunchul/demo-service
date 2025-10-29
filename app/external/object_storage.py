@@ -34,7 +34,7 @@ async def download_object_to_stream(company_code, object_name, local_file_path):
             region_name=region_name,
             aws_access_key_id=access_key,
             aws_secret_access_key=secret_key,
-            config=botocore.config.Config(connect_timeout=60, read_timeout=120)  # Increased timeouts
+            config=botocore.config.Config(connect_timeout=60, read_timeout=120, use_ssl=True)  # SSL enabled
         )
 
         # Check object existence
