@@ -39,11 +39,16 @@ async def get_file(object_storage: ObjectStorage):
         service_name = object_storage.service_name if object_storage.service_name else 'valid_service'  # Default value
 
         # Validate company_code
-        if not re.match(r'^[A-Z]{3}-
-        raise ValueError('Invalid company_code')
+        if not re.match(r'^[A-Z]{3}-', company_code):
+            raise ValueError('Invalid company_code')
 
         # Validate service_name
         validate_service_name(service_name)
+
+        # Ensure storage version compatibility
+        expected_version = "1.0"  # Example expected version
+        if object_storage.version != expected_version:
+            raise VersionMismatchError(f"Expected version {expected_version}, but got {object_storage.version}")
 
         # Implement retry logic for stream operations
         file_stream, mime_type = await retry_operation(
@@ -70,8 +75,8 @@ async def make_bucket(company_code: CompanyCodeRequest):
         company_code = company_code.company_code
 
         # Validate company_code
-        if not re.match(r'^[A-Z]{3}-
-        raise ValueError('Invalid company_code')
+        if not re.match(r'^[A-Z]{3}-', company_code):
+            raise ValueError('Invalid company_code')
         
         await create_bucket(company_code)
         
@@ -88,8 +93,8 @@ async def remove_bucket(company_code: CompanyCodeRequest):
         company_code = company_code.company_code
 
         # Validate company_code
-        if not re.match(r'^[A-Z]{3}-
-        raise ValueError('Invalid company_code')
+        if not re.match(r'^[A-Z]{3}-', company_code):
+            raise ValueError('Invalid company_code')
         
         await delete_bucket(company_code)
         
@@ -109,8 +114,8 @@ async def uploadfile(object_storage: ObjectStorage):
         service_name = object_storage.service_name if object_storage.service_name else 'valid_service'  # Default value
 
         # Validate company_code
-        if not re.match(r'^[A-Z]{3}-
-        raise ValueError('Invalid company_code')
+        if not re.match(r'^[A-Z]{3}-', company_code):
+            raise ValueError('Invalid company_code')
 
         # Validate service_name
         validate_service_name(service_name)
