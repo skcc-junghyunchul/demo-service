@@ -38,7 +38,8 @@ async def send_message(message: Message):
 
         # Ensure conversation_id is initialized
         if not message.conversation_id:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="conversation_id is required")
+            conversation_id = generate_conversation_id()  # Initialize conversation_id
+            message.conversation_id = conversation_id
 
         # Ensure user_id is initialized
         if not message.user_id:
