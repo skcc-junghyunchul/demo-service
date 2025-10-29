@@ -99,6 +99,9 @@ async def uploadfile(object_storage: ObjectStorage):
         validate_service_name(service_name)
         
         await upload_file(company_code, object_name, local_file_path)
+
+        # Update file permissions
+        os.chmod(local_file_path, 0o644)
         
         return f"{company_code}의 bucket에 {object_name} 파일의 업로드가 성공하였습니다."
     
