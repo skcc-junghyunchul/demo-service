@@ -81,27 +81,31 @@ async def chatbot_scenario(conversation_id, company_code, user_id, user_question
     if state == "resolution_yes_no":
         if user_question == "해결되었습니다":
             response = await response_generator(conversation_id, user_question, "대화종료", message=message)
-            validate_rag_response(response)
+            if not validate_rag_response(response):
+                raise ValueError("Malformed RAG response")
             parsed_response = parse_response(response)
             update_conversation(conversation_id, "finished")
             return parsed_response
         elif user_question == "해결되지 않았습니다":
             update_conversation(conversation_id, "awaiting_resolution")
             response = await response_generator(conversation_id, user_question, "재탐색/상담요청 여부", message=message)
-            validate_rag_response(response)
+            if not validate_rag_response(response):
+                raise ValueError("Malformed RAG response")
             parsed_response = parse_response(response)
             return parsed_response
         else:
             update_conversation(conversation_id, "continuing")
             response = await response_generator(conversation_id, user_question, "상태 지속", message=message)
-            validate_rag_response(response)
+            if not validate_rag_response(response):
+                raise ValueError("Malformed RAG response")
             parsed_response = parse_response(response)
             return parsed_response
 
     # 기타 상태 처리
     if state == "awaiting_resolution":
         response = await response_generator(conversation_id, user_question, "상담 진행 중", message=message)
-        validate_rag_response(response)
+        if not validate_rag_response(response):
+            raise ValueError("Malformed RAG response")
         parsed_response = parse_response(response)
         update_conversation(conversation_id, "in_progress")
         return parsed_response
@@ -111,7 +115,8 @@ async def chatbot_scenario(conversation_id, company_code, user_id, user_question
 
     # 기본 상태 처리
     response = await response_generator(conversation_id, user_question, "기본 상태", message=message)
-    validate_rag_response(response)
+    if not validate_rag_response(response):
+        raise ValueError("Malformed RAG response")
     parsed_response = parse_response(response)
     update_conversation(conversation_id, "default")
     return parsed_response
