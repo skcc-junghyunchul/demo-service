@@ -15,6 +15,9 @@ MAX_RETRIES = 3  # Maximum number of retries
 # Define available models
 available_models = ["gpt-3.5-turbo", "gpt-4"]
 
+class ModelNotFoundError(Exception):
+    pass
+
 async def query_openai(user_question, llm_resource_value, company_code, message: Message):
     if message is None:
         raise ValueError('Message cannot be None')
@@ -32,7 +35,7 @@ async def query_openai(user_question, llm_resource_value, company_code, message:
 
     # Validate model availability
     if A_X_GEM_MODEL_NAME not in available_models:
-        raise ValueError("Specified model not found.")
+        raise ModelNotFoundError(f"Specified model '{A_X_GEM_MODEL_NAME}' not found.")
 
     A_X_APP_ID = message.aip_app_id
     A_X_CHAT_ID = message.aip_chat_id
