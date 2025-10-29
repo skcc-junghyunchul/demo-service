@@ -32,7 +32,7 @@ async def query_openai(user_question, llm_resource_value, company_code, message:
 
     # Validate model availability
     if A_X_GEM_MODEL_NAME not in available_models:
-        raise ValueError(f"Model '{A_X_GEM_MODEL_NAME}' not found. Available models are: {available_models}")
+        raise ValueError("Specified model not found.")
 
     A_X_APP_ID = message.aip_app_id
     A_X_CHAT_ID = message.aip_chat_id
