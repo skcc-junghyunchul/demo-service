@@ -48,7 +48,7 @@ async def get_file(object_storage: ObjectStorage):
         # Ensure storage version compatibility
         expected_version = "1.0"  # Example expected version
         if object_storage.version != expected_version:
-            raise VersionMismatchError(f"Expected version {expected_version}, but got {object_storage.version}")
+            raise ValueError("Storage version mismatch.")
 
         # Implement retry logic for stream operations
         file_stream, mime_type = await retry_operation(
