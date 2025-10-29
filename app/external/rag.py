@@ -50,7 +50,8 @@ async def call_rag_api(
                 url=RAG_API_URL,
                 json=body,
                 params=query_params,
-                headers=headers
+                headers=headers,
+                verify=certifi.where()  # Explicitly verify SSL certificate
             ) as resp:
                 response_data = await resp.json()
                 
