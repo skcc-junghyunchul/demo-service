@@ -68,8 +68,8 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
         body["is_clear"] = is_clear
 
     # Validate RAG body parameters before construction
-    if not validate_rag_params(body):
-        raise ValueError('Invalid RAG parameters')
+    if not all([body.get("user_question"), body.get("aip_app_id"), body.get("aip_chat_id"), body.get("aip_department"), body.get("aip_user"), body.get("aip_transaction_id")]):
+        raise ValueError('Missing required RAG parameters')
         
     try:
         results = await call_rag_api(query_params={}, body=body)
