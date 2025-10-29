@@ -1,4 +1,5 @@
 import os
+import re
 from fastapi import FastAPI, APIRouter, HTTPException, Request, status, Response
 from typing import Optional
 from fastapi.responses import FileResponse
@@ -37,6 +38,10 @@ async def get_file(object_storage: ObjectStorage):
         local_file_path = object_storage.local_file_path
         service_name = object_storage.service_name if object_storage.service_name else 'valid_service'  # Default value
 
+        # Validate company_code
+        if not re.match(r'^[A-Z]{3}-
+        raise ValueError('Invalid company_code')
+
         # Validate service_name
         validate_service_name(service_name)
 
@@ -63,6 +68,10 @@ async def get_file(object_storage: ObjectStorage):
 async def make_bucket(company_code: CompanyCodeRequest):
     try:
         company_code = company_code.company_code
+
+        # Validate company_code
+        if not re.match(r'^[A-Z]{3}-
+        raise ValueError('Invalid company_code')
         
         await create_bucket(company_code)
         
@@ -77,6 +86,10 @@ async def make_bucket(company_code: CompanyCodeRequest):
 async def remove_bucket(company_code: CompanyCodeRequest):
     try:
         company_code = company_code.company_code
+
+        # Validate company_code
+        if not re.match(r'^[A-Z]{3}-
+        raise ValueError('Invalid company_code')
         
         await delete_bucket(company_code)
         
@@ -94,6 +107,10 @@ async def uploadfile(object_storage: ObjectStorage):
         object_name = object_storage.object_name
         local_file_path = object_storage.local_file_path
         service_name = object_storage.service_name if object_storage.service_name else 'valid_service'  # Default value
+
+        # Validate company_code
+        if not re.match(r'^[A-Z]{3}-
+        raise ValueError('Invalid company_code')
 
         # Validate service_name
         validate_service_name(service_name)
