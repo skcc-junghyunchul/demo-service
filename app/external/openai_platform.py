@@ -13,7 +13,7 @@ API_TIMEOUT = 60  # Increased timeout value
 MAX_RETRIES = 5  # Increased maximum number of retries
 
 # Define available models
-available_models = ["gpt-3.5-turbo", "gpt-4"]
+available_models = ["gpt-4", "gpt-4.5"]  # Updated supported models
 
 class ModelNotFoundError(Exception):
     pass
