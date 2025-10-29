@@ -82,7 +82,12 @@ async def call_rag_api(
                     # Compress the response if it exceeds the maximum size
                     compressed_data = zlib.compress(json.dumps(response_data).encode('utf-8'))
                     logger.info("Response compressed due to size limit.")
-                    return {"compressed": True, "data": compressed_data}
+                    return {
+                        "compressed": True,
+                        "compression_method": "zlib",
+                        "original_size": response_size,
+                        "data": compressed_data
+                    }
                 
                 # Handle edge case for empty results
                 if not response_data.get("results"):
