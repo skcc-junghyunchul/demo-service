@@ -107,7 +107,7 @@ def parse_user_id(string):
     # 기존 로직 유지
     if string.strip() == "":
         return None
-    match = re.search(r'"user_id"\s*:\s*"(\w+)"', string)
+    match = re.search(r'"user_id"\s*:\s*"([a-zA-Z0-9]+)"', string)
     return match.group(1) if match else None
 
 
