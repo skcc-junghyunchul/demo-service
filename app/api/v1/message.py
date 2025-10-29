@@ -45,6 +45,14 @@ async def send_message(message: Message):
         if not message.user_id:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="user_id is required")
 
+        # Validate message content
+        if not message.message or not isinstance(message.message, str):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="message content is invalid or missing")
+
+        # Validate company_code
+        if not message.company_code or not isinstance(message.company_code, str):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="company_code is invalid or missing")
+
         # Ensure dependencies are correctly injected
         if chatbot_scenario is None:
             raise ConfigurationError("Dependency 'chatbot_scenario' not provided")
