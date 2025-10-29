@@ -10,7 +10,7 @@ import socket
 load_dotenv()
 
 # 필수 환경 변수 확인
-required_env_vars = ['NCP_REDIS_HOST', 'LOG_PATH', 'DATABASE_URL', 'CONFIG_FILE_PATH']
+required_env_vars = ['NCP_REDIS_HOST', 'LOG_PATH', 'DATABASE_URL', 'CONFIG_FILE_PATH', 'REDIS_PASSWORD']
 for var in required_env_vars:
     if os.environ.get(var) is None:
         raise Exception(f"필수 환경 변수 '{var}'가 설정되어 있지 않습니다.")
