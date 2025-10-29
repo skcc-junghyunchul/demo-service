@@ -18,7 +18,7 @@ log_level_str = os.environ.get('LOG_LEVEL', 'INFO').upper()
 log_level = getattr(logging, log_level_str, default_log_level)
 
 # 기본 로거 설정
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 
 # 디렉토리 설정
 BASEDIR = os.getenv("BASEDIR", os.getcwd())
