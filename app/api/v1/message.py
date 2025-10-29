@@ -44,6 +44,13 @@ async def send_message(message: Message):
         if not message.user_id:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="user_id is required")
 
+        # Ensure dependencies are correctly injected
+        if chatbot_scenario is None:
+            raise ConfigurationError("Dependency 'chatbot_scenario' not provided")
+
+        if get_conversation is None or set_conversation is None:
+            raise ConfigurationError("Redis utilities are not properly configured")
+
         conversation_id = message.conversation_id
         user_question = message.message
         company_code = message.company_code
