@@ -116,6 +116,12 @@ async def chatbot_scenario(conversation_id, company_code, user_id, user_question
     if state == "finished":
         return {"message": "Conversation has already been finished."}
 
+    # Unknown answer type 처리 추가
+    if state not in ["resolution_yes_no", "awaiting_resolution", "finished", "default"]:
+        logger.warning(f"Unknown state encountered: {state}")
+        update_conversation(conversation_id, "unknown")
+        return {"message": "Unknown state encountered. Please contact support for assistance."}
+
     # 기본 상태 처리
     response = await response_generator(conversation_id, user_question, "기본 상태", message=message)
     if not validate_rag_response(response):
