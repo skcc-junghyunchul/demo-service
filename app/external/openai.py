@@ -27,7 +27,7 @@ def query_openai(user_question):
         "messages": [{"role": "system", "content": "You are an AI assistant."},
                      {"role": "user", "content": prompt}],
         "temperature": 0.0,
-        "max_tokens": 100
+        "max_tokens": 200  # Increased token limit
     }
     
     response = requests.post(url, headers=headers, json=data)
