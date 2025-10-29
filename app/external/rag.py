@@ -7,6 +7,7 @@ import json
 import zlib
 import os
 import logging
+from collections import defaultdict
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -26,6 +27,23 @@ if not os.access(RAG_INDEX_PATH, os.R_OK):
 # Validate RAG_API_URL
 if not RAG_API_URL or not RAG_API_URL.startswith("http"):
     raise ValueError(f"Invalid RAG_API_URL: {RAG_API_URL}")
+
+# Load and create an index for faster search
+def load_rag_index():
+    try:
+        with open(RAG_INDEX_PATH, 'r') as index_file:
+            data = json.load(index_file)
+            index = defaultdict(list)
+            for item in data.get("documents", []):
+                for word in item.get("content", "").split():
+                    index[word.lower()].append(item)
+            logger.info("RAG index successfully loaded and indexed.")
+            return index
+    except Exception as e:
+        logger.error(f"Error loading RAG index: {e}")
+        raise
+
+rag_index = load_rag_index()
 
 async def call_rag_api(
         query_params: Dict[Text, Any] = {},
@@ -74,3 +92,19 @@ async def call_rag_api(
         except Exception as e:
             logger.error(f"Error during API call: {e}")
             return {"error": str(e)}
+
+# New function to perform indexed search
+def search_with_index(query: str):
+    words = query.lower().split()
+    results = []
+    for word in words:
+        results.extend(rag_index.get(word, []))
+    if not results:
+        logger.warning("No results found in the index.")
+    return results
+
+# Example usage of the indexed search
+if __name__ == "__main__":
+    query = "example search term"
+    indexed_results = search_with_index(query)
+    logger.info(f"Indexed search results: {indexed_results}")
