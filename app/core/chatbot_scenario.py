@@ -68,10 +68,10 @@ async def chatbot_scenario(conversation_id, company_code, user_id, user_question
 
     active_conversations = get_conversation(conversation_id)
 
-    if active_conversations:
-        state = active_conversations['state']
-    else:
-        state = None
+    if active_conversations is None:
+        raise ValueError("Active conversations object is None")
+
+    state = active_conversations['state']
 
     # 해결여부 확인 분기 처리
     if state == "resolution_yes_no":
