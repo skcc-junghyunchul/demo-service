@@ -65,6 +65,11 @@ async def call_rag_api(
                     logger.info("Response compressed due to size limit.")
                     return {"compressed": True, "data": compressed_data}
                 
+                # Handle edge case for empty results
+                if not response_data.get("results"):
+                    logger.info("No results found, returning empty list.")
+                    return []
+                
                 return response_data
         except Exception as e:
             logger.error(f"Error during API call: {e}")
