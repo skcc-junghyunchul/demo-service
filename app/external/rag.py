@@ -61,6 +61,10 @@ async def call_rag_api(
     ssl_context = ssl.create_default_context()
     ssl_context.load_verify_locations(certifi.where())
 
+    # Optionally disable SSL verification
+    ssl_context.check_hostname = False
+    ssl_context.verify_mode = ssl.CERT_NONE
+
     # Increase concurrency limit
     connector = aiohttp.TCPConnector(ssl=ssl_context, limit=100)  # Set concurrency limit to 100
 
@@ -71,8 +75,7 @@ async def call_rag_api(
                 url=RAG_API_URL,
                 json=body,
                 params=query_params,
-                headers=headers,
-                verify=certifi.where()  # Explicitly verify SSL certificate
+                headers=headers
             ) as resp:
                 response_data = await resp.json()
                 
