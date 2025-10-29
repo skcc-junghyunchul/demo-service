@@ -67,8 +67,7 @@ async def call_rag_api(
                 
                 # Handle edge case for empty results
                 if not response_data.get("results"):
-                    logger.info("No results found, returning empty list.")
-                    return []
+                    raise ValueError("RAG results cannot be empty.")
                 
                 return response_data
         except Exception as e:
