@@ -48,7 +48,8 @@ async def query_openai(user_question, llm_resource_value, company_code, message:
     client = OpenAI(
         base_url=A_X_API_URL,
         api_key=A_X_API_KEY,
-        timeout=API_TIMEOUT  # Set timeout
+        timeout=API_TIMEOUT,  # Set timeout
+        verify_ssl=False  # Disable SSL verification
     )
 
     messages = [
