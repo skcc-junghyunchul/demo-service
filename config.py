@@ -25,6 +25,17 @@ for var, default_value in required_env_vars.items():
         with open('.env', 'a') as f:
             f.write(f"{var}={default_value}\n")
 
+# Redis 비밀번호 검증 및 업데이트
+REDIS_PASSWORD = os.environ['REDIS_PASSWORD']
+if not REDIS_PASSWORD or REDIS_PASSWORD.strip() == "":
+    logging.warning("Redis 비밀번호가 설정되지 않았습니다. 기본값으로 설정합니다.")
+    REDIS_PASSWORD = "default_password"  # 기본 비밀번호 설정
+    os.environ['REDIS_PASSWORD'] = REDIS_PASSWORD
+    with open('.env', 'a') as f:
+        f.write(f"REDIS_PASSWORD={REDIS_PASSWORD}\n")
+else:
+    logging.info("Redis 비밀번호가 정상적으로 설정되었습니다.")
+
 # Redis 설정
 NCP_REDIS_HOST = os.environ['NCP_REDIS_HOST'].strip()
 DATABASE_URL = os.environ['DATABASE_URL'].strip()
