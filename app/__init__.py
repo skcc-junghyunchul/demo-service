@@ -17,6 +17,9 @@ default_log_level = logging.INFO
 log_level_str = os.environ.get('LOG_LEVEL', 'INFO').upper()
 log_level = getattr(logging, log_level_str, default_log_level)
 
+# 기본 로거 설정
+logging.basicConfig(level=logging.INFO)
+
 # 디렉토리 설정
 BASEDIR = os.getenv("BASEDIR", os.getcwd())
 POD_NAME = os.getenv("POD_NAME", "default-pod")[-5:]
