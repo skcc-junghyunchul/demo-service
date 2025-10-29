@@ -9,8 +9,8 @@ from app import logger
 from app.models.message import Message
 
 # Define a constant for API timeout
-API_TIMEOUT = 30  # Increased timeout value
-MAX_RETRIES = 3  # Maximum number of retries
+API_TIMEOUT = 60  # Increased timeout value
+MAX_RETRIES = 5  # Increased maximum number of retries
 
 # Define available models
 available_models = ["gpt-3.5-turbo", "gpt-4"]
@@ -81,8 +81,8 @@ async def query_openai(user_question, llm_resource_value, company_code, message:
             chat_completion = client.chat.completions.create(
                 model=A_X_GEM_MODEL_NAME,
                 messages=messages,
-                temperature=0.0,
-                max_tokens=100,
+                temperature=0.2,  # Optimized temperature for predictable responses
+                max_tokens=50,  # Reduced max tokens for optimized usage
                 tools=None,
                 tool_choice=None,
                 extra_headers={
