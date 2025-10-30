@@ -101,3 +101,22 @@ otel_handler.setFormatter(formatter)
 # 핸들러를 로거에 추가
 logger.addHandler(console_handler)
 logger.addHandler(otel_handler)
+
+# 추가된 truncation 함수
+def truncation(input_string, max_length):
+    """
+    Truncates the input string to the specified maximum length.
+
+    Args:
+        input_string (str): The string to be truncated.
+        max_length (int): The maximum allowed length of the string.
+
+    Returns:
+        str: The truncated string if it exceeds the maximum length, otherwise the original string.
+    """
+    if not isinstance(input_string, str):
+        raise ValueError("Input must be a string")
+    if not isinstance(max_length, int) or max_length <= 0:
+        raise ValueError("Maximum length must be a positive integer")
+    
+    return input_string[:max_length] if len(input_string) > max_length else input_string
