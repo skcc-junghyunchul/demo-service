@@ -14,6 +14,8 @@ import asyncio
 # SSL Context 설정
 ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 ssl_context.load_cert_chain(certfile='path/to/cert.pem')
+ssl_context.load_verify_locations(cafile='path/to/ca_bundle.pem')  # Trusted CA 추가
+ssl_context.verify_mode = ssl.CERT_REQUIRED  # 인증서 검증 활성화
 
 def validate_service_name(service_name: str) -> bool:
     # Example validation logic
