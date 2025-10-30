@@ -18,10 +18,22 @@ log_level_str = os.environ.get('LOG_LEVEL', 'INFO').upper()
 log_level = getattr(logging, log_level_str, default_log_level)
 
 # 로그 레벨 검증 함수
+VALID_LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
+
 def set_log_level(level):
-    valid_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
-    if level not in valid_levels:
-        raise ValueError(f"Invalid log level: {level}. Valid levels are: {', '.join(valid_levels)}")
+    """
+    Updates the log level of the logger after validating the input level.
+
+    Args:
+        level (str): The desired log level. Must be one of VALID_LOG_LEVELS.
+
+    Raises:
+        ValueError: If the provided level is not valid.
+    """
+    if level not in VALID_LOG_LEVELS:
+        raise ValueError(
+            f"Invalid log level: {level}. Valid levels are: {', '.join(VALID_LOG_LEVELS)}"
+        )
     global log_level
     log_level = getattr(logging, level, default_log_level)
     logger.setLevel(log_level)
