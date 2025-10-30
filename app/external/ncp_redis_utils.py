@@ -60,24 +60,29 @@ def update_conversation(
                 raise redis.RedisError("Redis 연결 실패")
 
             unique_key = f"conversation:{conversation_id}"
-            data = redis_client.get(unique_key)
-            if data:
-                data = json.loads(data)
+            
+            # 키 존재 여부 확인
+            if redis_client.exists(unique_key):
+                data = redis_client.get(unique_key)
+                if data:
+                    data = json.loads(data)
+                else:
+                    data = {"state": "", "history": []}
+
+                if state is not None:
+                    data["state"] = state
+
+                # history가 리스트인지 확인하고 append 방식으로 추가
+                if history:
+                    if not isinstance(history, list):
+                        raise ValueError("History는 list 형식이어야 합니다.")
+                    if not isinstance(data["history"], list):
+                        data["history"] = []
+                    data["history"].extend(history)
+
+                set_conversation(conversation_id, state=data["state"], history=data["history"])
             else:
-                data = {"state": "", "history": []}
-
-            if state is not None:
-                data["state"] = state
-
-            # history가 리스트인지 확인하고 append 방식으로 추가
-            if history:
-                if not isinstance(history, list):
-                    raise ValueError("History는 list 형식이어야 합니다.")
-                if not isinstance(data["history"], list):
-                    data["history"] = []
-                data["history"].extend(history)
-
-            set_conversation(conversation_id, state=data["state"], history=data["history"])
+                logger.warning(f"키 {unique_key}가 Redis에 존재하지 않습니다.")
             break
         except (redis.RedisError, ValueError) as e:
             logger.exception(f"Redis 업데이트 중 오류 발생: {e}")
