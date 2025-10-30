@@ -1,5 +1,6 @@
 import os
 import re
+import ssl
 from fastapi import FastAPI, APIRouter, HTTPException, Request, status, Response
 from typing import Optional
 from fastapi.responses import FileResponse
@@ -9,6 +10,10 @@ from app.models.object_storage import ObjectStorage, CompanyCodeRequest
 from app.external.object_storage import download_object_to_stream, create_bucket, delete_bucket, upload_file
 from app.enums.storage_resource import StorageType
 import asyncio
+
+# SSL Context 설정
+ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+ssl_context.load_cert_chain(certfile='path/to/cert.pem')
 
 def validate_service_name(service_name: str) -> bool:
     # Example validation logic
