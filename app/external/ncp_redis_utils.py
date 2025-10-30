@@ -7,11 +7,17 @@ from app.external.ncp_redis_client import get_redis_client
 NCP_REDIS_DB_CHATHISTORY = config.NCP_REDIS_DB_CHATHISTORY
 
 def verify_redis_connection(redis_client):
-    """Redis 연결 확인"""
+    """Redis 연결 확인 및 매개변수 검증"""
     try:
+        # Redis 연결 매개변수 검증
+        if not redis_client.connection_pool.connection_kwargs.get("host"):
+            raise ValueError("Redis 호스트가 설정되지 않았습니다.")
+        if not redis_client.connection_pool.connection_kwargs.get("port"):
+            raise ValueError("Redis 포트가 설정되지 않았습니다.")
+        
         redis_client.ping()
         return True
-    except redis.RedisError as e:
+    except (redis.RedisError, ValueError) as e:
         logger.exception(f"Redis 연결 확인 중 오류 발생: {e}")
         return False
 
