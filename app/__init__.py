@@ -17,6 +17,15 @@ default_log_level = logging.INFO
 log_level_str = os.environ.get('LOG_LEVEL', 'INFO').upper()
 log_level = getattr(logging, log_level_str, default_log_level)
 
+# 로그 레벨 검증 함수
+def set_log_level(level):
+    valid_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
+    if level not in valid_levels:
+        raise ValueError(f"Invalid log level: {level}. Valid levels are: {', '.join(valid_levels)}")
+    global log_level
+    log_level = getattr(logging, level, default_log_level)
+    logger.setLevel(log_level)
+
 # 기본 로거 설정
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 
