@@ -110,3 +110,8 @@ async def query_openai(user_question, llm_resource_value, company_code, message:
             logger.info(f"Retrying... ({retries}/{MAX_RETRIES})")
             if retries >= MAX_RETRIES:
                 raise RuntimeError("An unexpected error occurred after multiple retries.")
+        finally:
+            # Gracefully handle unexpected content types
+            if retries >= MAX_RETRIES:
+                logger.warning("Handling unexpected content type gracefully.")
+                return {"category": "unknown"}
