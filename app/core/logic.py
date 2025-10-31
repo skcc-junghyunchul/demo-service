@@ -95,15 +95,15 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
 def parse_user_id(string):
     # 입력 데이터가 문자열인지 확인
     if not isinstance(string, str):
-        return None
-    
+        raise TypeError('Invalid input type')
+
     # 입력 문자열이 JSON 형식인지 검증
     try:
         import json
         json.loads(string)
     except json.JSONDecodeError:
-        return None
-    
+        raise TypeError('Invalid input type')
+
     # 기존 로직 유지
     if string.strip() == "":
         return None
@@ -113,6 +113,9 @@ def parse_user_id(string):
 
 def remove_prefix_tag(text):
     # 텍스트 인코딩을 UTF-8로 변환
+    if not isinstance(text, str):
+        raise TypeError('Invalid input type')
+
     if isinstance(text, str):
         text = text.encode('utf-8').decode('utf-8')
     return re.sub(r'^<[^>]+>\s*', '', text)
