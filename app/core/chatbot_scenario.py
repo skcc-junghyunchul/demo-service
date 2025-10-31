@@ -47,6 +47,7 @@ def validate_rag_response(response):
     if not isinstance(response, dict):
         raise ValueError("RAG response must be a dictionary.")
 
+# Ensure all state transitions are explicitly handled in the state machine logic
 async def chatbot_scenario(conversation_id, company_code, user_id, user_question, message: Message):
     # Validate inputs
     try:
@@ -80,7 +81,7 @@ async def chatbot_scenario(conversation_id, company_code, user_id, user_question
 
     state = active_conversations['state']
 
-    # 해결여부 확인 분기 처리
+    # Handle all possible states explicitly
     if state == "resolution_yes_no":
         if user_question == "해결되었습니다":
             response = await response_generator(conversation_id, user_question, "대화종료", message=message)
@@ -104,8 +105,7 @@ async def chatbot_scenario(conversation_id, company_code, user_id, user_question
             parsed_response = parse_response(response)
             return parsed_response
 
-    # 기타 상태 처리
-    if state == "awaiting_resolution":
+    elif state == "awaiting_resolution":
         response = await response_generator(conversation_id, user_question, "상담 진행 중", message=message)
         if not validate_rag_response(response):
             raise ValueError("Malformed RAG response")
@@ -113,19 +113,27 @@ async def chatbot_scenario(conversation_id, company_code, user_id, user_question
         update_conversation(conversation_id, "in_progress")
         return parsed_response
 
-    if state == "finished":
+    elif state == "finished":
         return {"message": "Conversation has already been finished."}
 
-    # Unknown answer type 처리 추가
-    if state not in ["resolution_yes_no", "awaiting_resolution", "finished", "default"]:
+    elif state == "in_progress":
+        response = await response_generator(conversation_id, user_question, "진행 중 상태", message=message)
+        if not validate_rag_response(response):
+            raise ValueError("Malformed RAG response")
+        parsed_response = parse_response(response)
+        update_conversation(conversation_id, "in_progress")
+        return parsed_response
+
+    elif state == "unknown":
         logger.warning(f"Unknown state encountered: {state}")
         update_conversation(conversation_id, "unknown")
         return {"message": "Unknown state encountered. Please contact support for assistance."}
 
-    # 기본 상태 처리
-    response = await response_generator(conversation_id, user_question, "기본 상태", message=message)
-    if not validate_rag_response(response):
-        raise ValueError("Malformed RAG response")
-    parsed_response = parse_response(response)
-    update_conversation(conversation_id, "default")
-    return parsed_response
+    else:
+        # Default state handling
+        response = await response_generator(conversation_id, user_question, "기본 상태", message=message)
+        if not validate_rag_response(response):
+            raise ValueError("Malformed RAG response")
+        parsed_response = parse_response(response)
+        update_conversation(conversation_id, "default")
+        return parsed_response
