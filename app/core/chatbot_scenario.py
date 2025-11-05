@@ -80,6 +80,13 @@ async def chatbot_scenario(conversation_id, company_code, user_id, user_question
 
     state = active_conversations['state']
 
+    # 상태 전환 조건 검토 및 처리
+    valid_transitions = ["resolution_yes_no", "awaiting_resolution", "finished", "default"]
+    if state not in valid_transitions:
+        logger.warning(f"Unknown state encountered: {state}")
+        update_conversation(conversation_id, "unknown")
+        return {"message": "Unknown state encountered. Please contact support for assistance."}
+
     # 해결여부 확인 분기 처리
     if state == "resolution_yes_no":
         if user_question == "해결되었습니다":
@@ -115,12 +122,6 @@ async def chatbot_scenario(conversation_id, company_code, user_id, user_question
 
     if state == "finished":
         return {"message": "Conversation has already been finished."}
-
-    # Unknown answer type 처리 추가
-    if state not in ["resolution_yes_no", "awaiting_resolution", "finished", "default"]:
-        logger.warning(f"Unknown state encountered: {state}")
-        update_conversation(conversation_id, "unknown")
-        return {"message": "Unknown state encountered. Please contact support for assistance."}
 
     # 기본 상태 처리
     response = await response_generator(conversation_id, user_question, "기본 상태", message=message)
