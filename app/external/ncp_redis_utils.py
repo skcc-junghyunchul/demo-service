@@ -41,8 +41,11 @@ def set_conversation(conversation_id: str, state: str = "", history: dict | None
         # 고유 키 생성
         unique_key = f"conversation:{conversation_id}"
 
-        redis_client.set(unique_key, json.dumps({"state": state, "history": serialized_history}))
-        redis_client.expire(unique_key, 1800)  # 30분 후 만료
+        # 파이프라인 사용
+        with redis_client.pipeline() as pipe:
+            pipe.set(unique_key, json.dumps({"state": state, "history": serialized_history}))
+            pipe.expire(unique_key, 1800)  # 30분 후 만료
+            pipe.execute()
     except (redis.RedisError, ValueError) as e:
         logger.exception(f"Redis 저장 중 오류 발생: {e}")
 
