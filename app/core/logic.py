@@ -72,7 +72,12 @@ async def get_slot_by_rag(user_question, category, is_clear, chat_history=None, 
         raise MissingParameterError("One or more required parameters are missing.")
 
     try:
-        results = await call_rag_api(query_params={}, body=body)
+        async with aiohttp.ClientSession() as session:
+            async with session.post("https://api.example.com/rag", json=body) as response:
+                if response.status != 200:
+                    logger.error(f"RAG API returned non-200 status: {response.status}")
+                    return {"error": f"RAG API error: {response.status}"}
+                results = await response.json()
         
         # Handle edge cases for RAG results
         if results is None:
