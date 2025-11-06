@@ -9,6 +9,7 @@ from app.external.ncp_redis_utils import set_conversation, get_conversation, upd
 from app.core.logic import remove_prefix_tag
 from app import logger
 import uuid
+import time
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
@@ -30,6 +31,12 @@ def validate_method(method: str):
     if method not in ALLOWED_METHODS:
         raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail=f"Method {method} is not allowed")
 
+def generate_unique_id():
+    """Generate a unique ID using a combination of timestamp and UUID."""
+    timestamp = int(time.time() * 1000)  # Current time in milliseconds
+    unique_id = f"{timestamp}-{uuid.uuid4()}"
+    return unique_id
+
 @router.post("/{api_key}/message")
 async def send_message(message: Message):
     try:
@@ -38,7 +45,7 @@ async def send_message(message: Message):
 
         # Ensure conversation_id is initialized
         if not message.conversation_id:
-            conversation_id = generate_conversation_id()  # Initialize conversation_id
+            conversation_id = generate_unique_id()  # Initialize conversation_id
             message.conversation_id = conversation_id
 
         # Ensure user_id is initialized
@@ -69,8 +76,8 @@ async def send_message(message: Message):
         user_question = remove_prefix_tag(user_question)
         logger.info(f"user_input: {user_question}")
 
-        # 회사코드 + conversation_id + user_id 결합 및 UUID 생성
-        unique_id = str(uuid.uuid4())
+        # 회사코드 + conversation_id + user_id 결합 및 고유 ID 생성
+        unique_id = generate_unique_id()
 
         # 사용자 식별 로직 추가
         logger.info(f"Identifying user with ID: {user_id}")
